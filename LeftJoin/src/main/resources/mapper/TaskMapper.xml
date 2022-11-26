@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.codeshu.mapper.TaskMapper">
+    <resultMap id="taskMap" type="com.codeshu.entity.TaskEntity">
+        <id column="id" property="id"/>
+        <result column="task_name" property="taskName"/>
+    </resultMap>
+
+    <select id="getAll" resultMap="taskMap">
+        SELECT * FROM task
+    </select>
+
+    <select id="getAllByPlanType" resultMap="taskMap">
+        SELECT t.* FROM task as t
+        <if test="planType != null">
+            JOIN plan_task as pt ON pt.task_id = t.id
+            JOIN plan as p ON pt.plan_id = p.id
+        </if>
+        <where>
+            <if test="planType != null">
+                AND p.plan_type  = #{planType}
+            </if>
+        </where>
+    </select>
+
+    <!--可以直接从Map中获取-->
+    <select id="getByMap" resultMap="taskMap">
+        SELECT * FROM task
+        <where>
+            <if test="taskName != null">
+                AND task_name = #{taskName};
+            </if>
+        </where>
+    </select>
+</mapper>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.codeshu.mapper.PlanMapper">
+    <resultMap id="planMap" type="com.codeshu.entity.PlanEntity">
+        <id column="id" property="id"/>
+        <result column="plan_name" property="planName"/>
+        <result column="plan_type" property="planType"/>
+        <result column="issue_time" property="issueTime"/>
+    </resultMap>
+
+    <select id="getAll" resultMap="planMap">
+        SELECT * FROM plan;
+    </select>
+</mapper>
