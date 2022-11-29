@@ -1,5 +1,7 @@
 package com.codeshu.plan;
 
+import com.codeshu.time.TimeConvertUtils;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -371,6 +373,8 @@ public class PlanUtils2 {
 		Calendar nowCalendar = Calendar.getInstance();
 		startCalendar.setTime(format.parse(start));
 		nowCalendar.setTime(format.parse(now));
+		//开始的天号
+		int startDay = startCalendar.get(Calendar.DAY_OF_MONTH);
 
 		//间隔为0表示每个月都需要，如果今天和开始时间的天数一样，返回true
 		if (intervalMonth == 0){
@@ -380,10 +384,28 @@ public class PlanUtils2 {
 				return false;
 			}
 		}
-		//间隔不为0
+		//间隔不为0则需要进行递增开始计划时间
 		while (true){
-			//让计划开始时间递增指定间隔月份
-			startCalendar.add(Calendar.MONTH,intervalMonth);
+			//二月份需要特殊处理，假设开始时间是2022-01-29，那么递增到2月份就变为2022-02-28(2022年2月份最大天数为28)，再递增到3月份就变为2022-03-28却不是2022-03-29
+			//错误：2022-01-29 2022-02-28 2022-03-28 正确：2022-01-29 2022-02-28 2022-03-29
+			//如果是2月份，即将递增为3月份
+			if (startCalendar.get(Calendar.MONTH) + 1 == 2){
+				//得到今年2月份的最后一天，可能是28，也可能是29
+				String lastDayOfMonth = TimeConvertUtils.getLastDayOfMonth(startCalendar.get(Calendar.YEAR), 2);
+				int twoMonthLastDay = Integer.parseInt(lastDayOfMonth.split("-")[2]);
+				//如果开始天号小于2月份的最后一天，则可以直接递增到3月份
+				if (startDay <= twoMonthLastDay){
+					startCalendar.add(Calendar.MONTH,intervalMonth);
+				}else {
+					//如果开始天好大于2月份的最后一天，3月份需要恢复为开始天号，再去递增到4月份
+					startCalendar.add(Calendar.MONTH,intervalMonth);
+					startCalendar.set(Calendar.DAY_OF_MONTH,startDay);
+				}
+			}else {
+				//如果不是2月份，则可以直接递增
+				startCalendar.add(Calendar.MONTH,intervalMonth);
+			}
+
 			//递增后大于当前时间，则返回false
 			if (startCalendar.compareTo(nowCalendar) > 0){
 				return false;
