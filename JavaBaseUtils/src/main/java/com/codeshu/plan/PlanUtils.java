@@ -196,11 +196,11 @@ public class PlanUtils {
 		//下发时间点
 		String issueTime = "10:46";
 		//计划开始时间
-		String startTime = "2000-11-18";
+		String startTime = "2000-10-30";
 		//计划结束时间
 		String endTime = "2022-12-20";
 		//每隔2个月触发一次
-		Integer monthDay =2;
+		Integer monthDay =1;
 		//提前下发时间
 		int tiqian = 30;
 		Calendar calendar = Calendar.getInstance();
@@ -247,11 +247,11 @@ public class PlanUtils {
 		//下发时间点
 		String issueTime = "10:46";
 		//计划开始时间
-		String startTime = "2000-11-18";
+		String startTime = "2000-02-29";
 		//计划结束时间
-		String endTime = "2022-11-20";
+		String endTime = "2022-12-30";
 		//每隔2个月触发一次
-		Integer monthDay = 2;
+		int monthDay = 1;
 		//提前下发时间
 		int tiqian = 30;
 		Calendar calendar = Calendar.getInstance();
@@ -293,55 +293,49 @@ public class PlanUtils {
 	 * @return 满足返回true，否则返回false
 	 */
 	public static boolean isPatchBySeason(String now,String start,int jiange) throws ParseException {
-		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 		//将时间转为统一格式，用于比较，忽略时分秒
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		//开始计划时间
 		Calendar startCalendar = Calendar.getInstance();
+		//现在时间
 		Calendar nowCalendar = Calendar.getInstance();
+		//从开始计划时间，进行递增的时间
+		Calendar addCalendar = Calendar.getInstance();
 		startCalendar.setTime(format.parse(start));
 		nowCalendar.setTime(format.parse(now));
+		addCalendar.setTime(format.parse(start));
 		System.out.println("现在的时间：" + now);
 		System.out.println("开始的时间：" + start);
 		//开始的天号
 		int startDay = startCalendar.get(Calendar.DAY_OF_MONTH);
+		//今天的天号
+		int nowDay = nowCalendar.get(Calendar.DAY_OF_MONTH);
 
-		//间隔为0表示每个月都需要，如果今天和开始时间的天数一样，返回true
-		if (jiange == 0){
-			if (nowCalendar.get(Calendar.DAY_OF_MONTH) == startCalendar.get(Calendar.DAY_OF_MONTH)){
-				return true;
-			}else {
-				return false;
-			}
+		//开始天号和今天天号相同才可能执行，如果开始天号和今天天号不同，则直接不执行
+		if (startDay != nowDay){
+			//开始时间是2020-11-30 今天天号是2022-11-31 30和31不同则不需要往下走
+			return false;
 		}
-		//间隔不为0则需要进行递增开始计划时间
-		while (true){
-			//二月份需要特殊处理，假设开始时间是2022-01-29，那么递增到2月份就变为2022-02-28(2022年2月份最大天数为28)，再递增到3月份就变为2022-03-28却不是2022-03-29
-			//错误：2022-01-29 2022-02-28 2022-03-28 正确：2022-01-29 2022-02-28 2022-03-29
-			//如果是2月份，即将递增为3月份
-			if (startCalendar.get(Calendar.MONTH) + 1 == 2){
-				//得到今年2月份的最后一天，可能是28，也可能是29
-				String lastDayOfMonth = TimeConvertUtils.getLastDayOfMonth(startCalendar.get(Calendar.YEAR), 2);
-				int twoMonthLastDay = Integer.parseInt(lastDayOfMonth.split("-")[2]);
-				//如果开始天号小于2月份的最后一天，则可以直接递增到3月份
-				if (startDay <= twoMonthLastDay){
-					startCalendar.add(Calendar.MONTH,jiange);
-				}else {
-					//如果开始天好大于2月份的最后一天，3月份需要恢复为开始天号，再去递增到4月份
-					startCalendar.add(Calendar.MONTH,jiange);
-					startCalendar.set(Calendar.DAY_OF_MONTH,startDay);
-				}
-			}else {
-				//如果不是2月份，则可以直接递增
-				startCalendar.add(Calendar.MONTH,jiange);
-			}
 
-			System.out.println("间隔" + jiange + "个月时间：" + format.format(startCalendar.getTime()));
+		//往下就是开始天号和今天天号相同，判断的是间隔月份是否满足
+		//比如开始时间是2022-10-30，间隔2个月，而今天天号是2022-11-30是不满足的，而今天天号是2022-12-30是满足的
+
+		//间隔为0表示每个月都需要
+		if (jiange == 0){
+			return true;
+		}
+		//间隔不为0则需要根据间隔时间对开始计划时间进行递增月份
+		while (true){
+			//从开始时间进行递增月份
+			TimeConvertUtils.addMonth(startDay,jiange,addCalendar);
+			System.out.println("间隔" + jiange + "个月时间：" + format.format(addCalendar.getTime()));
 			//递增后大于当前时间，则返回false
-			if (startCalendar.compareTo(nowCalendar) > 0){
+			if (addCalendar.compareTo(nowCalendar) > 0){
 				return false;
 			}
 			//递增后等于当前时间，则返回true
-			if (startCalendar.compareTo(nowCalendar) == 0){
-				System.out.println("匹配的时间：" + format.format(startCalendar.getTime()));
+			if (addCalendar.compareTo(nowCalendar) == 0){
+				System.out.println("匹配的时间：" + format.format(addCalendar.getTime()));
 				return true;
 			}
 		}
@@ -355,36 +349,49 @@ public class PlanUtils {
 	 * @return 满足返回true，否则返回false
 	 */
 	public static boolean isPatchByYear(String now,String start,int jiange) throws ParseException {
-		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 		//将时间转为统一格式，用于比较，忽略时分秒
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		//计划开始时间
 		Calendar startCalendar = Calendar.getInstance();
+		//现在时间
 		Calendar nowCalendar = Calendar.getInstance();
+		//在计划开始时间，进行递增的时间
+		Calendar addCalendar = Calendar.getInstance();
 		startCalendar.setTime(format.parse(start));
 		nowCalendar.setTime(format.parse(now));
+		addCalendar.setTime(format.parse(start));
 		System.out.println("现在的时间：" + now);
 		System.out.println("开始的时间：" + start);
+		int nowDay = nowCalendar.get(Calendar.DAY_OF_MONTH);
+		int startDay = startCalendar.get(Calendar.DAY_OF_MONTH);
+		int nowMonth = nowCalendar.get(Calendar.MONTH);
+		int startMonth = startCalendar.get(Calendar.MONTH);
+
+		//开始月份、天号和今天月份、天号相同才可能执行，如果不同，则直接不执行
+		if (nowDay != startDay && nowMonth != startMonth){
+			//开始时间是2020-11-30，那么今天是2021-11-31（天号不同）和2021-10-30（月份不同）都不符合触发条件
+			return false;
+		}
+
+		//往下就是开始月份、天号和今天月份、天号相同，判断的是间隔年份是否满足
+		//比如开始时间是2020-10-30，间隔2年，而今天天号是2021-10-30是不满足的，而今天天号是2022-10-30是满足的
 
 		//间隔为0表示每个年都需要，如果今天和开始时间的天数且月份也一样，返回true
 		if (jiange == 0){
-			if (nowCalendar.get(Calendar.DAY_OF_MONTH) == startCalendar.get(Calendar.DAY_OF_MONTH)
-					&& nowCalendar.get(Calendar.MONTH) == startCalendar.get(Calendar.MONTH)) {
-				return true;
-			}else {
-				return false;
-			}
+			return true;
 		}
 		//间隔不为0
 		while (true){
 			//让计划开始时间递增指定间隔年份
-			startCalendar.add(Calendar.YEAR,jiange);
-			System.out.println("间隔" + jiange + "个年时间：" + format.format(startCalendar.getTime()));
+			TimeConvertUtils.addYear(startDay,jiange,addCalendar);
+			System.out.println("间隔" + jiange + "个年时间：" + format.format(addCalendar.getTime()));
 			//递增后大于当前时间，则返回false
-			if (startCalendar.compareTo(nowCalendar) > 0){
+			if (addCalendar.compareTo(nowCalendar) > 0){
 				return false;
 			}
 			//递增后等于当前时间，则返回true
-			if (startCalendar.compareTo(nowCalendar) == 0){
-				System.out.println("匹配的时间：" + format.format(startCalendar.getTime()));
+			if (addCalendar.compareTo(nowCalendar) == 0){
+				System.out.println("匹配的时间：" + format.format(addCalendar.getTime()));
 				return true;
 			}
 		}

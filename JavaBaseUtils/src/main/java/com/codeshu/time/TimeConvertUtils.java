@@ -169,7 +169,7 @@ public class TimeConvertUtils {
 		}
 	}
 
-	//===================================================递增n个月之后的时间=============================================
+	//===================================================递增n个月和n个年之后的时间=============================================
 
 	/**
 	 * 递增n个月之后的时间
@@ -185,7 +185,7 @@ public class TimeConvertUtils {
 			return;
 		}
 
-		//假设开始时间是2022-01-29，那么递增到2月份就变为2022-02-28(2022年2月份最大天数为28)，再递增到3月份就变为2022-03-28却不是2022-03-29
+		//假设开始时间是2022-01-29，递增1个月，那么递增到2月份就变为2022-02-28(2022年2月份最大天数为28)，再递增到3月份就变为2022-03-28却不是2022-03-29
 		//错误：2022-01-29 2022-02-28 2022-03-28 正确：2022-01-29 2022-02-28 2022-03-29
 
 		//设置当前时间的天号为1号
@@ -193,6 +193,35 @@ public class TimeConvertUtils {
 		//对当前时间进行递增jiange个月
 		addCalendar.add(Calendar.MONTH,jiange);
 		//取得递增后的月份的最后一天
+		String lastDayOfMonth = TimeConvertUtils.getLastDayOfMonth(addCalendar.get(Calendar.YEAR), addCalendar.get(Calendar.MONTH) + 1);
+		//递增后的月份的最后一天的天号
+		int lastDay = Integer.parseInt(lastDayOfMonth.split("-")[2]);
+		//递增后的月份的最后一天，要小于开始时间
+		if (lastDay < startDay){
+			//设置递增后的月份的天号为最后一天
+			addCalendar.set(Calendar.DAY_OF_MONTH,lastDay);
+		}else {
+			//设置递增后的月份的天号为开始天号
+			addCalendar.set(Calendar.DAY_OF_MONTH,startDay);
+		}
+	}
+
+	/**
+	 * 递增n个年之后的时间
+	 * @param startDay 开始时间的天号
+	 * @param jiange 间隔多少个年（递增多少个年）
+	 * @param addCalendar 递增后的时间
+	 * 例子：开始时间为2000-02-29，间隔时间为1年，每次调用此方法进行递增，则2000-02-29 2001-02-28 2002-02-28 2003-02-28 2004-02-29
+	 */
+	public static void addYear(Integer startDay,Integer jiange,Calendar addCalendar){
+		//假设开始时间是2000-02-29，那么递增1年就变为2001-02-28(2001年2月份最大天数为28)，递增到2004年还是2004-02-28而不是2004-02-29
+		//错误：2000-02-29 2001-02-28 2002-02-28 2003-02-28 2004-02-28 正确：2000-02-29 2001-02-28 2002-02-28 2003-02-28 2004-02-29
+
+		//设置当前时间的天号为1号
+		addCalendar.set(Calendar.DAY_OF_MONTH, 1);
+		//对当前时间进行递增jiange个年
+		addCalendar.add(Calendar.YEAR,jiange);
+		//取得递增后那一年的月份的最后一天
 		String lastDayOfMonth = TimeConvertUtils.getLastDayOfMonth(addCalendar.get(Calendar.YEAR), addCalendar.get(Calendar.MONTH) + 1);
 		//递增后的月份的最后一天的天号
 		int lastDay = Integer.parseInt(lastDayOfMonth.split("-")[2]);

@@ -1,6 +1,5 @@
-package com.codeshu.plan.devivce;
+package com.codeshu.plan;
 
-import com.codeshu.plan.IdomDetectionPlanDTO;
 import com.codeshu.time.TimeConvertUtils;
 
 import java.text.ParseException;
@@ -10,10 +9,11 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * 最终版本
  * @author CodeShu
  * @date 2022/11/17 15:22
  */
-public class PlanUtils {
+public class PlanUtils3 {
 	public static void main(String[] args) {
 
 	}
