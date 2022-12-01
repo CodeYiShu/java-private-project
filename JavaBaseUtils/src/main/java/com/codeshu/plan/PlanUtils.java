@@ -12,6 +12,7 @@ import java.util.List;
 /**
  * 计划时间判断工具类
  * 简便版本
+ *
  * @author codeshu
  */
 public class PlanUtils {
@@ -118,7 +119,7 @@ public class PlanUtils {
 	 * 月巡检计划
 	 * 每月的多少号的特定下发时间点执行
 	 */
-	public static void taskByMonth(Date nowDate){
+	public static void taskByMonth(Date nowDate) {
 		Calendar nowCalendar = Calendar.getInstance();
 		nowCalendar.setTime(nowDate);
 		SimpleDateFormat longFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -260,8 +261,8 @@ public class PlanUtils {
 	/**
 	 * 季计划：判断当前时间是否满足指定时间间隔
 	 *
-	 * @param now    当前时间
-	 * @param start  计划开始时间
+	 * @param now           当前时间
+	 * @param start         计划开始时间
 	 * @param intervalMonth 间隔月份数
 	 * @return 满足返回true，否则返回false
 	 */
@@ -317,8 +318,8 @@ public class PlanUtils {
 	/**
 	 * 年计划：判断当前时间是否满足指定时间间隔
 	 *
-	 * @param now    当前时间
-	 * @param start  计划开始时间
+	 * @param now          当前时间
+	 * @param start        计划开始时间
 	 * @param intervalYear 间隔时间
 	 * @return 满足返回true，否则返回false
 	 */

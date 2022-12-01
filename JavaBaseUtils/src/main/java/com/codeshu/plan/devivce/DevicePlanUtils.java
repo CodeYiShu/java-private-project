@@ -10,6 +10,7 @@ import java.util.List;
 
 /**
  * 计划时间判断工具类结合业务
+ *
  * @author CodeShu
  * @date 2022/11/17 15:22
  */
@@ -21,7 +22,7 @@ public class DevicePlanUtils {
 		System.out.println(bool);
 	}
 
-	public static boolean isNeedToRunPlan(Date now, IdomDetectionPlanDTO planDTO){
+	public static boolean isNeedToRunPlan(Date now, IdomDetectionPlanDTO planDTO) {
 		//计划类型 1、日 2、周 3、月 4、季度 5、年
 		Integer detectionType = planDTO.getDetectionType();
 		//下发时间点 HH:mm
@@ -41,29 +42,29 @@ public class DevicePlanUtils {
 				String planEndTime = simpleDateFormat.format(planEndDate);
 				switch (detectionType) {
 					case 1:
-						isNeedFlag = taskByDay(now,issueTimes,aheadMinute);
+						isNeedFlag = taskByDay(now, issueTimes, aheadMinute);
 						break;
 					case 2:
 						String[] weekDay = planDTO.getWeekRepeat().split(",");
-						isNeedFlag = taskByWeek(now,issueTimes,aheadMinute,weekDay);
+						isNeedFlag = taskByWeek(now, issueTimes, aheadMinute, weekDay);
 						break;
 					case 3:
 						String[] monthDay = planDTO.getDayRepeat().split(",");
-						isNeedFlag = taskByMonth(now,issueTimes,aheadMinute,monthDay);
+						isNeedFlag = taskByMonth(now, issueTimes, aheadMinute, monthDay);
 						break;
 					case 4:
 						Integer repeatMonth = planDTO.getRepeatPeriod();
-						isNeedFlag = taskBySeason(now,issueTimes,planStartTime,aheadMinute,repeatMonth);
+						isNeedFlag = taskBySeason(now, issueTimes, planStartTime, aheadMinute, repeatMonth);
 						break;
 					case 5:
 						Integer repeatYear = planDTO.getRepeatPeriod();
-						isNeedFlag = taskByYear(now,issueTimes,planStartTime,aheadMinute,repeatYear);
+						isNeedFlag = taskByYear(now, issueTimes, planStartTime, aheadMinute, repeatYear);
 						break;
 					default:
 				}
 				return isNeedFlag;
 			}
-		}catch (Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
 		}
@@ -73,11 +74,12 @@ public class DevicePlanUtils {
 	/**
 	 * 日巡检计划
 	 * 每天特定下发时间点执行 如每天的13:53分执行
-	 * @param issueTimes 下发时间
+	 *
+	 * @param issueTimes  下发时间
 	 * @param aheadMinute 提前下发时间
 	 * @return 触发返回true
 	 */
-	public static boolean taskByDay(Date nowDate,List<String> issueTimes,Integer aheadMinute) {
+	public static boolean taskByDay(Date nowDate, List<String> issueTimes, Integer aheadMinute) {
 		SimpleDateFormat longFormat = new SimpleDateFormat("yyyy-MM-dd");
 		SimpleDateFormat shortFormat = new SimpleDateFormat("HH:mm");
 		//和计划时间进行相比
@@ -92,16 +94,16 @@ public class DevicePlanUtils {
 			calendar.setTime(nowDate);
 			calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(issueTime.split(":")[0]));
 			calendar.set(Calendar.MINUTE, Integer.parseInt(issueTime.split(":")[1]));
-			calendar.add(Calendar.MINUTE,-aheadMinute);
+			calendar.add(Calendar.MINUTE, -aheadMinute);
 			Date aheadDate = calendar.getTime();
 			String aheadTime = shortFormat.format(aheadDate);
 			//具有提前下发时间，则当前时间到达提前下发时间进行下发
-			if (aheadMinute != 0){
-				if (nowShort.compareTo(aheadTime) == 0){
+			if (aheadMinute != 0) {
+				if (nowShort.compareTo(aheadTime) == 0) {
 					return true;
 				}
-			}else{ //不具有提前下发时间，则当前时间到达下发时间进行下发
-				if (nowShort.compareTo(issueTime) == 0){
+			} else { //不具有提前下发时间，则当前时间到达下发时间进行下发
+				if (nowShort.compareTo(issueTime) == 0) {
 					return true;
 				}
 			}
@@ -114,12 +116,13 @@ public class DevicePlanUtils {
 	/**
 	 * 周巡检计划
 	 * 每周指定周几触发
-	 * @param issueTimes 下发时间
+	 *
+	 * @param issueTimes  下发时间
 	 * @param aheadMinute 提前下发时间
-	 * @param weekDay 指定周几
+	 * @param weekDay     指定周几
 	 * @return 触发返回true
 	 */
-	public static boolean taskByWeek(Date nowDate,List<String> issueTimes,Integer aheadMinute,String[] weekDay) {
+	public static boolean taskByWeek(Date nowDate, List<String> issueTimes, Integer aheadMinute, String[] weekDay) {
 		Calendar nowCalendar = Calendar.getInstance();
 		nowCalendar.setTime(nowDate);
 		SimpleDateFormat longFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -159,12 +162,12 @@ public class DevicePlanUtils {
 				return false;
 			}
 			//具有提前下发时间，则当前时间到达提前下发时间进行下发
-			if (aheadMinute != 0){
-				if (nowShort.compareTo(aheadTime) == 0){
+			if (aheadMinute != 0) {
+				if (nowShort.compareTo(aheadTime) == 0) {
 					return true;
 				}
-			}else{ //不具有提前下发时间，则当前时间到达下发时间进行下发
-				if (nowShort.compareTo(issueTime) == 0){
+			} else { //不具有提前下发时间，则当前时间到达下发时间进行下发
+				if (nowShort.compareTo(issueTime) == 0) {
 					return true;
 				}
 			}
@@ -177,12 +180,13 @@ public class DevicePlanUtils {
 	/**
 	 * 月巡检计划 ：每月指定多少号触发
 	 * 每月的多少号的特定下发时间点执行
-	 * @param issueTimes 下发时间
+	 *
+	 * @param issueTimes  下发时间
 	 * @param aheadMinute 提前下发时间
-	 * @param monthDay 指定几号
+	 * @param monthDay    指定几号
 	 * @return 触发返回true
 	 */
-	public static boolean taskByMonth(Date nowDate,List<String> issueTimes,Integer aheadMinute,String[] monthDay) {
+	public static boolean taskByMonth(Date nowDate, List<String> issueTimes, Integer aheadMinute, String[] monthDay) {
 		Calendar nowCalendar = Calendar.getInstance();
 		nowCalendar.setTime(nowDate);
 		SimpleDateFormat longFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -202,7 +206,7 @@ public class DevicePlanUtils {
 			calendar.setTime(nowDate);
 			calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(issueTime.split(":")[0]));
 			calendar.set(Calendar.MINUTE, Integer.parseInt(issueTime.split(":")[1]));
-			calendar.add(Calendar.MINUTE,-aheadMinute);
+			calendar.add(Calendar.MINUTE, -aheadMinute);
 			Date aheadDate = calendar.getTime();
 			String aheadTime = shortFormat.format(aheadDate);
 
@@ -214,16 +218,16 @@ public class DevicePlanUtils {
 					break;
 				}
 			}
-			if (!flag){
+			if (!flag) {
 				return false;
 			}
 			//具有提前下发时间，则当前时间到达提前下发时间进行下发
-			if (aheadMinute != 0){
-				if (nowShort.compareTo(aheadTime) == 0){
+			if (aheadMinute != 0) {
+				if (nowShort.compareTo(aheadTime) == 0) {
 					return true;
 				}
-			}else{ //不具有提前下发时间，则当前时间到达下发时间进行下发
-				if (nowShort.compareTo(issueTime) == 0){
+			} else { //不具有提前下发时间，则当前时间到达下发时间进行下发
+				if (nowShort.compareTo(issueTime) == 0) {
 					return true;
 				}
 			}
@@ -238,13 +242,14 @@ public class DevicePlanUtils {
 	 * 和开始计划时间的天号有关
 	 * 例子：开始计划时间为2020-10-10，每隔2个月，下发时间点为10:00
 	 * 结果：2020-12-10 10:00，2021-02-10 10:00，2021-04-10 10:00
-	 * @param issueTimes 下发时间
-	 * @param startTime 计划开始时间
-	 * @param aheadMinute 提前下发时间
+	 *
+	 * @param issueTimes    下发时间
+	 * @param startTime     计划开始时间
+	 * @param aheadMinute   提前下发时间
 	 * @param intervalMonth 间隔多少月
 	 * @return 触发返回true
 	 */
-	public static boolean taskBySeason(Date nowDate,List<String> issueTimes,String startTime,Integer aheadMinute,Integer intervalMonth) throws ParseException {
+	public static boolean taskBySeason(Date nowDate, List<String> issueTimes, String startTime, Integer aheadMinute, Integer intervalMonth) throws ParseException {
 		Calendar nowCalendar = Calendar.getInstance();
 		nowCalendar.setTime(nowDate);
 		SimpleDateFormat longFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -259,23 +264,23 @@ public class DevicePlanUtils {
 			calendar.setTime(nowDate);
 			calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(issueTime.split(":")[0]));
 			calendar.set(Calendar.MINUTE, Integer.parseInt(issueTime.split(":")[1]));
-			calendar.add(Calendar.MINUTE,-aheadMinute);
+			calendar.add(Calendar.MINUTE, -aheadMinute);
 			Date aheadDate = calendar.getTime();
 			String aheadTime = shortFormat.format(aheadDate);
 
 			//当前时间是否符合间隔和开始计划时间的天号
-			if (isPatchBySeason(nowLong,startTime,intervalMonth)){
+			if (isPatchBySeason(nowLong, startTime, intervalMonth)) {
 				//具有提前下发时间，则当前时间到达提前下发时间进行下发
-				if (aheadMinute != 0){
-					if (nowShort.compareTo(aheadTime) == 0){
+				if (aheadMinute != 0) {
+					if (nowShort.compareTo(aheadTime) == 0) {
 						return true;
 					}
-				}else{ //不具有提前下发时间，则当前时间到达下发时间进行下发
-					if (nowShort.compareTo(issueTime) == 0){
+				} else { //不具有提前下发时间，则当前时间到达下发时间进行下发
+					if (nowShort.compareTo(issueTime) == 0) {
 						return true;
 					}
 				}
-			}else {
+			} else {
 				//当前时间不符合间隔和开始计划时间的天号
 				return false;
 			}
@@ -287,13 +292,14 @@ public class DevicePlanUtils {
 
 	/**
 	 * 年巡检计划 ：指定每隔多少个年触发
-	 * @param issueTimes 下发时间
-	 * @param startTime 计划开始时间
-	 * @param aheadMinute 提前下发时间
+	 *
+	 * @param issueTimes   下发时间
+	 * @param startTime    计划开始时间
+	 * @param aheadMinute  提前下发时间
 	 * @param intervalYear 间隔多少年
 	 * @return 触发返回true
 	 */
-	public static boolean taskByYear(Date nowDate,List<String> issueTimes,String startTime,Integer aheadMinute,Integer intervalYear) throws ParseException {
+	public static boolean taskByYear(Date nowDate, List<String> issueTimes, String startTime, Integer aheadMinute, Integer intervalYear) throws ParseException {
 		Calendar nowCalendar = Calendar.getInstance();
 		nowCalendar.setTime(nowDate);
 		SimpleDateFormat longFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -308,23 +314,23 @@ public class DevicePlanUtils {
 			calendar.setTime(nowDate);
 			calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(issueTime.split(":")[0]));
 			calendar.set(Calendar.MINUTE, Integer.parseInt(issueTime.split(":")[1]));
-			calendar.add(Calendar.MINUTE,-aheadMinute);
+			calendar.add(Calendar.MINUTE, -aheadMinute);
 			Date aheadDate = calendar.getTime();
 			String aheadTime = shortFormat.format(aheadDate);
 
 			//当前时间是否符合间隔和开始计划时间的月份和天号
-			if (isPatchByYear(nowLong,startTime,intervalYear)){
+			if (isPatchByYear(nowLong, startTime, intervalYear)) {
 				//具有提前下发时间，则当前时间到达提前下发时间进行下发
-				if (aheadMinute != 0){
-					if (nowShort.compareTo(aheadTime) == 0){
+				if (aheadMinute != 0) {
+					if (nowShort.compareTo(aheadTime) == 0) {
 						return true;
 					}
-				}else{ //不具有提前下发时间，则当前时间到达下发时间进行下发
-					if (nowShort.compareTo(issueTime) == 0){
+				} else { //不具有提前下发时间，则当前时间到达下发时间进行下发
+					if (nowShort.compareTo(issueTime) == 0) {
 						return true;
 					}
 				}
-			}else {
+			} else {
 				//当前时间不否符合间隔和开始计划时间的月份和天号
 				return false;
 			}
@@ -336,12 +342,13 @@ public class DevicePlanUtils {
 
 	/**
 	 * 季计划：判断当前时间是否满足指定时间间隔
-	 * @param now 当前时间
-	 * @param start 计划开始时间
+	 *
+	 * @param now           当前时间
+	 * @param start         计划开始时间
 	 * @param intervalMonth 间隔时间
 	 * @return 满足返回true，否则返回false
 	 */
-	public static boolean isPatchBySeason(String now,String start,int intervalMonth) throws ParseException {
+	public static boolean isPatchBySeason(String now, String start, int intervalMonth) throws ParseException {
 		//将时间转为统一格式，用于比较，忽略时分秒
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 		//开始计划时间
@@ -359,7 +366,7 @@ public class DevicePlanUtils {
 		int nowDay = nowCalendar.get(Calendar.DAY_OF_MONTH);
 
 		//开始天号和今天天号相同才可能执行，如果开始天号和今天天号不同，则直接不执行
-		if (startDay != nowDay){
+		if (startDay != nowDay) {
 			//开始时间是2020-11-30 今天天号是2022-11-31 30和31不同则不需要往下走
 			return false;
 		}
@@ -368,20 +375,20 @@ public class DevicePlanUtils {
 		//比如开始时间是2022-10-30，间隔2个月，而今天天号是2022-11-30是不满足的，而今天天号是2022-12-30是满足的
 
 		//间隔为0表示每个月都需要
-		if (intervalMonth == 0){
+		if (intervalMonth == 0) {
 			return true;
 		}
 
 		//间隔不为0则需要根据间隔时间对开始计划时间进行递增月份
-		while (true){
+		while (true) {
 			//从开始时间进行递增月份
-			TimeConvertUtils.addMonth(startDay,intervalMonth,addCalendar);
+			TimeConvertUtils.addMonth(startDay, intervalMonth, addCalendar);
 			//递增后大于当前时间，则返回false
-			if (addCalendar.compareTo(nowCalendar) > 0){
+			if (addCalendar.compareTo(nowCalendar) > 0) {
 				return false;
 			}
 			//递增后等于当前时间，则返回true
-			if (addCalendar.compareTo(nowCalendar) == 0){
+			if (addCalendar.compareTo(nowCalendar) == 0) {
 				return true;
 			}
 		}
@@ -390,12 +397,13 @@ public class DevicePlanUtils {
 
 	/**
 	 * 年计划：判断当前时间是否满足指定时间间隔
-	 * @param now 当前时间
-	 * @param start 计划开始时间
+	 *
+	 * @param now          当前时间
+	 * @param start        计划开始时间
 	 * @param intervalYear 间隔时间
 	 * @return 满足返回true，否则返回false
 	 */
-	public static boolean isPatchByYear(String now,String start,int intervalYear) throws ParseException {
+	public static boolean isPatchByYear(String now, String start, int intervalYear) throws ParseException {
 		//将时间转为统一格式，用于比较，忽略时分秒
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 		//计划开始时间
@@ -413,7 +421,7 @@ public class DevicePlanUtils {
 		int startMonth = startCalendar.get(Calendar.MONTH);
 
 		//开始月份、天号和今天月份、天号相同才可能执行，如果不同，则直接不执行
-		if (nowDay != startDay && nowMonth != startMonth){
+		if (nowDay != startDay && nowMonth != startMonth) {
 			//开始时间是2020-11-30，那么今天是2021-11-31（天号不同）和2021-10-30（月份不同）都不符合触发条件
 			return false;
 		}
@@ -422,20 +430,20 @@ public class DevicePlanUtils {
 		//比如开始时间是2020-10-30，间隔2年，而今天天号是2021-10-30是不满足的，而今天天号是2022-10-30是满足的
 
 		//间隔为0表示每个年都需要，如果今天和开始时间的天数且月份也一样，返回true
-		if (intervalYear == 0){
+		if (intervalYear == 0) {
 			return true;
 		}
 
 		//间隔不为0
-		while (true){
+		while (true) {
 			//让计划开始时间递增指定间隔年份
-			TimeConvertUtils.addYear(startDay,intervalYear,addCalendar);
+			TimeConvertUtils.addYear(startDay, intervalYear, addCalendar);
 			//递增后大于当前时间，则返回false
-			if (addCalendar.compareTo(nowCalendar) > 0){
+			if (addCalendar.compareTo(nowCalendar) > 0) {
 				return false;
 			}
 			//递增后等于当前时间，则返回true
-			if (addCalendar.compareTo(nowCalendar) == 0){
+			if (addCalendar.compareTo(nowCalendar) == 0) {
 				return true;
 			}
 		}

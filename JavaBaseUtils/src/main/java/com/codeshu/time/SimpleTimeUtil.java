@@ -10,7 +10,7 @@ import java.util.List;
  * @author CodeShu
  * @date 2022/11/13 17:25
  */
-public class TimeUtil {
+public class SimpleTimeUtil {
 	public static void main(String[] args) {
 		List<String> dates = getCurrent24Hour();
 		System.out.println(dates);
@@ -19,7 +19,7 @@ public class TimeUtil {
 		getCurrentYear();
 	}
 
-	public static List<String> getCurrent24Hour(){
+	public static List<String> getCurrent24Hour() {
 		List<String> dates = new ArrayList<>();
 
 		//现在 2022/11/13 17:00:00
@@ -36,7 +36,7 @@ public class TimeUtil {
 		dates.add(start);
 
 		//中间时间 2022/11/13 00:01:00 ~ 2022/11/13 00:22:00
-		for (int i = 1; i < 23; i++){
+		for (int i = 1; i < 23; i++) {
 			calendar.set(Calendar.HOUR_OF_DAY, i);
 			calendar.set(Calendar.MINUTE, 0);
 			calendar.set(Calendar.SECOND, 0);
@@ -55,7 +55,7 @@ public class TimeUtil {
 		return dates;
 	}
 
-	public static List<String> getCurrentWeek(){
+	public static List<String> getCurrentWeek() {
 		List<String> dates = new ArrayList<>();
 
 		//现在 2022/11/13 17:00:00
@@ -77,7 +77,7 @@ public class TimeUtil {
 		return dates;
 	}
 
-	public static List<String> getCurrentMonth(){
+	public static List<String> getCurrentMonth() {
 		List<String> dates = new ArrayList<>();
 
 		//现在 2022/11/13 17:00:00
@@ -98,7 +98,7 @@ public class TimeUtil {
 		return dates;
 	}
 
-	public static List<String> getCurrentYear(){
+	public static List<String> getCurrentYear() {
 		List<String> dates = new ArrayList<>();
 
 		//现在 2022/11/13 17:00:00
@@ -110,8 +110,8 @@ public class TimeUtil {
 		String start = new SimpleDateFormat("yyyy").format(new Date()) + "-01-01" + " 00:00:00";
 		System.out.println(start);
 
-		calendar.set(Calendar.MONTH,calendar.getActualMaximum(Calendar.MONTH));
-		calendar.set(Calendar.DAY_OF_MONTH,calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+		calendar.set(Calendar.MONTH, calendar.getActualMaximum(Calendar.MONTH));
+		calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
 		String end = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(calendar.getTime());
 		System.out.println(end);
 

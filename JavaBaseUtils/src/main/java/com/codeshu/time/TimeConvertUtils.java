@@ -159,8 +159,8 @@ public class TimeConvertUtils {
 	 * @param year  年份
 	 * @param month 月份
 	 */
-	public static void dayReport(int year, int month) {
-
+	public static List<String> dayReport(int year, int month) {
+		List<String> days = new ArrayList<>();
 		Calendar cal = Calendar.getInstance();
 		int dayNumOfMonth = getDaysByYearMonth(year, month);
 		cal.set(Calendar.YEAR, year);
@@ -172,8 +172,9 @@ public class TimeConvertUtils {
 			Date d = cal.getTime();
 			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 			String df = simpleDateFormat.format(d);
-			System.out.println(df);
+			days.add(df);
 		}
+		return days;
 	}
 
 	//===================================================递增n个月和n个年之后的时间=============================================
@@ -245,42 +246,52 @@ public class TimeConvertUtils {
 	}
 
 	public static void main(String[] args) throws ParseException {
-		Map<String, String> map = new HashMap<>(10);
-
-		//指定范围的每一周的第一天和最后一天
-		map.put("startDate", "2022-10-03");
-		map.put("endDate", "2022-10-30");
-		List<String> week = rangeFirstAndEndDate("week", map);
-		System.out.println(week);
-
-		//指定范围的每一月的第一天和最后一天
-		String start = "2022-01";
-		String end = "2022-12";
-		String[] endTime = end.split("-");
-		start = start + "-01";
-		end = getLastDayOfMonth(Integer.parseInt(endTime[0]), Integer.parseInt(endTime[1]));
-		map.put("startDate", start);
-		map.put("endDate", end);
-		List<String> month = rangeFirstAndEndDate("month", map);
-		System.out.println(month);
+//		Map<String, String> map = new HashMap<>(10);
+//		//指定范围的每一周的第一天和最后一天
+//		map.put("startDate", "2022-10-03");
+//		map.put("endDate", "2022-10-30");
+//		List<String> week = rangeFirstAndEndDate("week", map);
+//		System.out.println(week);
+//		//两个两个取
+//		for (int i = 0; i < week.size(); i += 2) {
+//			System.out.println(week.get(i));
+//			System.out.println(week.get(i + 1));
+//			System.out.println();
+//		}
+//		//指定范围的每一月的第一天和最后一天
+//		String start = "2022-01";
+//		String end = "2022-12";
+//		String[] endTime = end.split("-");
+//		start = start + "-01";
+//		end = getLastDayOfMonth(Integer.parseInt(endTime[0]), Integer.parseInt(endTime[1]));
+//		map.put("startDate", start);
+//		map.put("endDate", end);
+//		List<String> month = rangeFirstAndEndDate("month", map);
+//		System.out.println(month);
 
 		//指定范围的所有日期
-		String begin = "2022-12-10";
-		String ending = "2022-12-20";
-		List<String> all = rangeAllDate(begin, ending);
-		System.out.println(all);
+//		String begin = "2022-12-10";
+//		String ending = "2022-12-20";
+//		List<String> all = rangeAllDate(begin, ending);
+//		System.out.println(all);
+//		//两个两个取
+//		for (int i = 0; i < all.size(); i += 2) {
+//			System.out.println(all.get(i));
+//			System.out.println(all.get(i + 1));
+//			System.out.println();
+//		}
+//		System.out.println("=============");
+//		for (int i = 0; i < all.size(); i += 2) {
+//			System.out.println(all.get(i).substring(0, 10));
+//			System.out.println(all.get(i).substring(0, 7));
+//		}
 
-		//两个两个取
-		for (int i = 0; i < all.size(); i += 2) {
-			System.out.println(all.get(i));
-			System.out.println(all.get(i + 1));
-			System.out.println();
-		}
 
-		System.out.println("=============");
-		for (int i = 0; i < all.size(); i += 2) {
-			System.out.println(all.get(i).substring(0, 10));
-			System.out.println(all.get(i).substring(0, 7));
+		Calendar startCalendar = Calendar.getInstance();
+		startCalendar.setTime(new SimpleDateFormat("yyyy-MM-dd").parse("2000-02-29"));
+		for (int i = 0; i < 20; i++) {
+			addYear(29,1,startCalendar);
+			System.out.println(new SimpleDateFormat("yyyy-MM-dd").format(startCalendar.getTime()));
 		}
 
 	}

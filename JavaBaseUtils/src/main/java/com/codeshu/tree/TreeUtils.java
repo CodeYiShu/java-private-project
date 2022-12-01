@@ -37,10 +37,10 @@ public class TreeUtils {
 		//得到指定父节点
 		TreeNode treeNode = getById(3L);
 		//获取所有子节点
-		getSubNode(treeNode,getAllNotTopNode(treeList));
+		getSubNode(treeNode, getAllNotTopNode(treeList));
 		//获取子节点的ID集合
 		List<Long> ids = new ArrayList<>();
-		getSonTreeNodeIds(treeNode.getSonNode(),ids);
+		getSonTreeNodeIds(treeNode.getSonNode(), ids);
 		System.out.println(ids);
 
 	}
@@ -72,10 +72,11 @@ public class TreeUtils {
 
 	/**
 	 * 获取指定节点的所有子节点
-	 * @param parentNode 父节点
-	 * @param allNotTopNode  所有非祖先节点（非祖先节点都有父节点）
+	 *
+	 * @param parentNode    父节点
+	 * @param allNotTopNode 所有非祖先节点（非祖先节点都有父节点）
 	 */
-	public static void getSubNode(TreeNode parentNode,List<TreeNode> allNotTopNode){
+	public static void getSubNode(TreeNode parentNode, List<TreeNode> allNotTopNode) {
 		//过滤出所有parentNode的子节点
 		Stream<TreeNode> treeNodeStream = allNotTopNode.stream().filter(new Predicate<TreeNode>() {
 			@Override
@@ -87,25 +88,26 @@ public class TreeUtils {
 		List<TreeNode> sonNodeList = treeNodeStream.collect(Collectors.toList());
 
 		//递归处理
-		if (!sonNodeList.isEmpty() || !(sonNodeList == null)){ //如果parentNode具备子节点，则继续获取其子节点的子节点
+		if (!sonNodeList.isEmpty() || !(sonNodeList == null)) { //如果parentNode具备子节点，则继续获取其子节点的子节点
 			parentNode.setSonNode(sonNodeList); //所有子节点先存入parentNode
 			sonNodeList.forEach(new Consumer<TreeNode>() { //递归所有子节点
 				@Override
 				public void accept(TreeNode treeNode) {
-					getSubNode(treeNode,allNotTopNode); //递归调用本方法，让子节点作为parentNode，用具有父节点的所有非祖先节点allNotTopNode来筛选
+					getSubNode(treeNode, allNotTopNode); //递归调用本方法，让子节点作为parentNode，用具有父节点的所有非祖先节点allNotTopNode来筛选
 				}
 			});
-		}else { //叶子节点的SonNode直接给一个空集合，停止递归
+		} else { //叶子节点的SonNode直接给一个空集合，停止递归
 			parentNode.setSonNode(new ArrayList<>());
 		}
 	}
 
 	/**
 	 * 获取所有顶层节点
+	 *
 	 * @param treeList 所有的节点数据
 	 * @return 顶层节点
 	 */
-	public static List<TreeNode> getAllTopNode(List<TreeNode> treeList){
+	public static List<TreeNode> getAllTopNode(List<TreeNode> treeList) {
 		//过滤出顶层节点
 		Stream<TreeNode> treeNodeStream = treeList.stream().filter(new Predicate<TreeNode>() {
 			@Override
@@ -119,10 +121,11 @@ public class TreeUtils {
 
 	/**
 	 * 获取所有非祖先节点
+	 *
 	 * @param treeList 所有的节点数据
 	 * @return 顶层节点
 	 */
-	public static List<TreeNode> getAllNotTopNode(List<TreeNode> treeList){
+	public static List<TreeNode> getAllNotTopNode(List<TreeNode> treeList) {
 		//过滤出顶层节点
 		Stream<TreeNode> treeNodeStream = treeList.stream().filter(new Predicate<TreeNode>() {
 			@Override
@@ -134,7 +137,7 @@ public class TreeUtils {
 		return notTopNodeList;
 	}
 
-	public static ArrayList<TreeNode> getTreeList(){
+	public static ArrayList<TreeNode> getTreeList() {
 		ArrayList<TreeNode> treeNodeArrayList = new ArrayList<>();
 		TreeNode treeNode1 = new TreeNode();
 		treeNode1.setId(1L);
@@ -167,10 +170,10 @@ public class TreeUtils {
 		return treeNodeArrayList;
 	}
 
-	public static TreeNode getById(Long id){
+	public static TreeNode getById(Long id) {
 		ArrayList<TreeNode> treeList = getTreeList();
 		for (TreeNode treeNode : treeList) {
-			if (treeNode.getId().equals(id)){
+			if (treeNode.getId().equals(id)) {
 				return treeNode;
 			}
 		}
@@ -180,7 +183,7 @@ public class TreeUtils {
 	/**
 	 * 提取所有子分类的ID
 	 */
-	public static void getSonTreeNodeIds(List<TreeNode> sonNodeList,List<Long> ids){
+	public static void getSonTreeNodeIds(List<TreeNode> sonNodeList, List<Long> ids) {
 		Stream<Long> longStream = sonNodeList.stream().map(new Function<TreeNode, Long>() {
 			@Override
 			public Long apply(TreeNode treeNode) {

@@ -7,31 +7,31 @@ import java.util.Date;
 import java.util.List;
 
 /**
-* 巡检计划
-*
-* @author Mark sunlightcs@gmail.com
-* @since 3.0 2022-11-16
-*/
+ * 巡检计划
+ *
+ * @author Mark sunlightcs@gmail.com
+ * @since 3.0 2022-11-16
+ */
 @Data
 public class IdomDetectionPlanDTO implements Serializable {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    private Long id;
-    private Integer detectionType;
-    private String planName;
-    private Date planStartDate;
-    private Date planEndDate;
-    private Integer aheadMinute;
-    private Integer repeatPeriod;
-    private String dayRepeat;
-    private String monthRepeat;
-    private String weekRepeat;
-    private Integer planStatus;
-    private String remark;
-    private Date createDate;
-    private Date updateDate;
-    private Long creator;
-    private Long updater;
+	private Long id;
+	private Integer detectionType;
+	private String planName;
+	private Date planStartDate;
+	private Date planEndDate;
+	private Integer aheadMinute;
+	private Integer repeatPeriod;
+	private String dayRepeat;
+	private String monthRepeat;
+	private String weekRepeat;
+	private Integer planStatus;
+	private String remark;
+	private Date createDate;
+	private Date updateDate;
+	private Long creator;
+	private Long updater;
 
-    private List<String> issueTimes;
+	private List<String> issueTimes;
 }
