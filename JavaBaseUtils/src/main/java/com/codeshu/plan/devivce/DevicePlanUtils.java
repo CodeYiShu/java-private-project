@@ -1,6 +1,5 @@
 package com.codeshu.plan.devivce;
 
-import com.codeshu.plan.IdomDetectionPlanDTO;
 import com.codeshu.time.TimeConvertUtils;
 
 import java.text.ParseException;
@@ -10,16 +9,19 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * 计划时间判断工具类结合业务
  * @author CodeShu
  * @date 2022/11/17 15:22
  */
-public class PlanUtils {
+public class DevicePlanUtils {
 	public static void main(String[] args) {
-
+		Date now = new Date();
+		IdomDetectionPlanDTO planDTO = new IdomDetectionPlanDTO();
+		boolean bool = isNeedToRunPlan(now, planDTO);
+		System.out.println(bool);
 	}
 
 	public static boolean isNeedToRunPlan(Date now, IdomDetectionPlanDTO planDTO){
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		//计划类型 1、日 2、周 3、月 4、季度 5、年
 		Integer detectionType = planDTO.getDetectionType();
 		//下发时间点 HH:mm
@@ -34,6 +36,7 @@ public class PlanUtils {
 		try {
 			boolean isNeedFlag = false;
 			if (detectionType != null && issueTimes != null && issueTimes.size() > 0 && planStartDate != null && planEndDate != null && aheadMinute != null) {
+				SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 				String planStartTime = simpleDateFormat.format(planStartDate);
 				String planEndTime = simpleDateFormat.format(planEndDate);
 				switch (detectionType) {
@@ -57,7 +60,6 @@ public class PlanUtils {
 						isNeedFlag = taskByYear(now,issueTimes,planStartTime,aheadMinute,repeatYear);
 						break;
 					default:
-						isNeedFlag = false;
 				}
 				return isNeedFlag;
 			}
@@ -69,7 +71,8 @@ public class PlanUtils {
 	}
 
 	/**
-	 * 日巡检计划 ：每日指定时间触发
+	 * 日巡检计划
+	 * 每天特定下发时间点执行 如每天的13:53分执行
 	 * @param issueTimes 下发时间
 	 * @param aheadMinute 提前下发时间
 	 * @return 触发返回true
@@ -77,9 +80,9 @@ public class PlanUtils {
 	public static boolean taskByDay(Date nowDate,List<String> issueTimes,Integer aheadMinute) {
 		SimpleDateFormat longFormat = new SimpleDateFormat("yyyy-MM-dd");
 		SimpleDateFormat shortFormat = new SimpleDateFormat("HH:mm");
-		//格式化后和计划时间进行相比
+		//和计划时间进行相比
 		String nowLong = longFormat.format(nowDate);
-		//格式化后和下发时间进行相比
+		//和下发时间进行相比
 		String nowShort = shortFormat.format(nowDate);
 
 		Calendar calendar = Calendar.getInstance();
@@ -109,7 +112,8 @@ public class PlanUtils {
 	}
 
 	/**
-	 * 周巡检计划 ：每周指定周几触发
+	 * 周巡检计划
+	 * 每周指定周几触发
 	 * @param issueTimes 下发时间
 	 * @param aheadMinute 提前下发时间
 	 * @param weekDay 指定周几
@@ -120,9 +124,9 @@ public class PlanUtils {
 		nowCalendar.setTime(nowDate);
 		SimpleDateFormat longFormat = new SimpleDateFormat("yyyy-MM-dd");
 		SimpleDateFormat shortFormat = new SimpleDateFormat("HH:mm");
-		//格式化后和计划时间进行相比
+		//和计划时间进行相比
 		String nowLong = longFormat.format(nowDate);
-		//格式化后和下发时间进行相比
+		//和下发时间进行相比
 		String nowShort = shortFormat.format(nowDate);
 		//转为整型
 		Integer[] weekDays = new Integer[weekDay.length];
@@ -172,6 +176,7 @@ public class PlanUtils {
 
 	/**
 	 * 月巡检计划 ：每月指定多少号触发
+	 * 每月的多少号的特定下发时间点执行
 	 * @param issueTimes 下发时间
 	 * @param aheadMinute 提前下发时间
 	 * @param monthDay 指定几号
@@ -182,9 +187,9 @@ public class PlanUtils {
 		nowCalendar.setTime(nowDate);
 		SimpleDateFormat longFormat = new SimpleDateFormat("yyyy-MM-dd");
 		SimpleDateFormat shortFormat = new SimpleDateFormat("HH:mm");
-		//格式化后和计划时间进行相比
+		//和计划时间进行相比
 		String nowLong = longFormat.format(nowDate);
-		//格式化后和下发时间进行相比
+		//和下发时间进行相比
 		String nowShort = shortFormat.format(nowDate);
 		//转为整型
 		Integer[] monthDays = new Integer[monthDay.length];
@@ -229,6 +234,10 @@ public class PlanUtils {
 
 	/**
 	 * 季巡检计划 ：指定每隔多少个月触发
+	 * 每隔多少月的特定下发时间点执行
+	 * 和开始计划时间的天号有关
+	 * 例子：开始计划时间为2020-10-10，每隔2个月，下发时间点为10:00
+	 * 结果：2020-12-10 10:00，2021-02-10 10:00，2021-04-10 10:00
 	 * @param issueTimes 下发时间
 	 * @param startTime 计划开始时间
 	 * @param aheadMinute 提前下发时间
@@ -240,9 +249,9 @@ public class PlanUtils {
 		nowCalendar.setTime(nowDate);
 		SimpleDateFormat longFormat = new SimpleDateFormat("yyyy-MM-dd");
 		SimpleDateFormat shortFormat = new SimpleDateFormat("HH:mm");
-		//格式化后和计划时间进行相比
+		//和计划时间进行相比
 		String nowLong = longFormat.format(nowDate);
-		//格式化后和下发时间进行相比
+		//和下发时间进行相比
 		String nowShort = shortFormat.format(nowDate);
 
 		Calendar calendar = Calendar.getInstance();
@@ -254,23 +263,24 @@ public class PlanUtils {
 			Date aheadDate = calendar.getTime();
 			String aheadTime = shortFormat.format(aheadDate);
 
-			//符合月份-天
+			//当前时间是否符合间隔和开始计划时间的天号
 			if (isPatchBySeason(nowLong,startTime,intervalMonth)){
-
+				//具有提前下发时间，则当前时间到达提前下发时间进行下发
+				if (aheadMinute != 0){
+					if (nowShort.compareTo(aheadTime) == 0){
+						return true;
+					}
+				}else{ //不具有提前下发时间，则当前时间到达下发时间进行下发
+					if (nowShort.compareTo(issueTime) == 0){
+						return true;
+					}
+				}
 			}else {
+				//当前时间不符合间隔和开始计划时间的天号
 				return false;
 			}
-			//具有提前下发时间，则当前时间到达提前下发时间进行下发
-			if (aheadMinute != 0){
-				if (nowShort.compareTo(aheadTime) == 0){
-					return true;
-				}
-			}else{ //不具有提前下发时间，则当前时间到达下发时间进行下发
-				if (nowShort.compareTo(issueTime) == 0){
-					return true;
-				}
-			}
 		}
+
 		//不符合下发时间点
 		return false;
 	}
@@ -288,9 +298,9 @@ public class PlanUtils {
 		nowCalendar.setTime(nowDate);
 		SimpleDateFormat longFormat = new SimpleDateFormat("yyyy-MM-dd");
 		SimpleDateFormat shortFormat = new SimpleDateFormat("HH:mm");
-		//格式化后和计划时间进行相比
+		//和计划时间进行相比
 		String nowLong = longFormat.format(nowDate);
-		//格式化后和下发时间进行相比
+		//和下发时间进行相比
 		String nowShort = shortFormat.format(nowDate);
 
 		Calendar calendar = Calendar.getInstance();
@@ -302,23 +312,24 @@ public class PlanUtils {
 			Date aheadDate = calendar.getTime();
 			String aheadTime = shortFormat.format(aheadDate);
 
-			//符合年份-月份-天
+			//当前时间是否符合间隔和开始计划时间的月份和天号
 			if (isPatchByYear(nowLong,startTime,intervalYear)){
-
+				//具有提前下发时间，则当前时间到达提前下发时间进行下发
+				if (aheadMinute != 0){
+					if (nowShort.compareTo(aheadTime) == 0){
+						return true;
+					}
+				}else{ //不具有提前下发时间，则当前时间到达下发时间进行下发
+					if (nowShort.compareTo(issueTime) == 0){
+						return true;
+					}
+				}
 			}else {
+				//当前时间不否符合间隔和开始计划时间的月份和天号
 				return false;
 			}
-			//具有提前下发时间，则当前时间到达提前下发时间进行下发
-			if (aheadMinute != 0){
-				if (nowShort.compareTo(aheadTime) == 0){
-					return true;
-				}
-			}else{ //不具有提前下发时间，则当前时间到达下发时间进行下发
-				if (nowShort.compareTo(issueTime) == 0){
-					return true;
-				}
-			}
 		}
+
 		//未达到下发时间点
 		return false;
 	}
