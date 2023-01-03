@@ -9,7 +9,8 @@
     </resultMap>
 
     <select id="getAll" resultMap="taskMap">
-        SELECT * FROM task
+        SELECT *
+        FROM task
     </select>
 
     <select id="getAllByPlanType" resultMap="taskMap">
@@ -20,7 +21,7 @@
         </if>
         <where>
             <if test="planType != null">
-                AND p.plan_type  = #{planType}
+                AND p.plan_type = #{planType}
             </if>
         </where>
     </select>
@@ -31,6 +32,26 @@
         <where>
             <if test="taskName != null">
                 AND task_name = #{taskName};
+            </if>
+        </where>
+    </select>
+
+    <!--可以直接从对象中获取-->
+    <select id="getByObj" resultMap="taskMap">
+        SELECT * FROM task
+        <where>
+            <if test="taskName != null">
+                AND task_name = #{taskName};
+            </if>
+        </where>
+    </select>
+
+    <!--可以直接从对象中获取，需要添加上名字前缀-->
+    <select id="getByObjWithName" resultMap="taskMap">
+        SELECT * FROM task
+        <where>
+            <if test="request.taskName != null">
+                AND task_name = #{request.taskName};
             </if>
         </where>
     </select>

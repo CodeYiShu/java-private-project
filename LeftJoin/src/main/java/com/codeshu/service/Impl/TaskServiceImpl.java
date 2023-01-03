@@ -1,5 +1,6 @@
 package com.codeshu.service.Impl;
 
+import com.codeshu.controller.GetByObjRequest;
 import com.codeshu.entity.TaskEntity;
 import com.codeshu.mapper.TaskMapper;
 import com.codeshu.service.TaskService;
@@ -34,5 +35,15 @@ public class TaskServiceImpl implements TaskService {
 		//params.put("taskName","任务1");
 		//Mybatis可以接收Map参数
 		return taskMapper.getByMap(params);
+	}
+
+	@Override
+	public List<TaskEntity> getByObj(GetByObjRequest request) {
+		return taskMapper.getByObj(request);
+	}
+
+	@Override
+	public List<TaskEntity> getByObjWithName(GetByObjRequest request) {
+		return taskMapper.getByObjWithName(request);
 	}
 }

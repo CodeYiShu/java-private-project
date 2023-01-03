@@ -37,7 +37,27 @@ public class TaskController {
 	 * http://localhost:8080/task/getByMap?taskName=任务1
 	 */
 	@GetMapping("/getByMap")
-	public List<TaskEntity> getByMap(@RequestParam Map<String,Object> params){
+	public List<TaskEntity> getByMap(@RequestParam Map<String, Object> params) {
 		return taskService.getByMap(params);
+	}
+
+	/**
+	 * 根据对象绑定查询
+	 * 比如key为taskName，value为任务1
+	 * http://localhost:8080/task/getByMap?taskName=任务1
+	 */
+	@GetMapping("/getByObj")
+	public List<TaskEntity> getByObj(GetByObjRequest request) {
+		return taskService.getByObj(request);
+	}
+
+	/**
+	 * 根据对象绑定查询，在Mapper中使用@Param起参数名字
+	 * 比如key为taskName，value为任务1
+	 * http://localhost:8080/task/getByMap?taskName=任务1
+	 */
+	@GetMapping("/getByObjWithName")
+	public List<TaskEntity> getByObjWithName(GetByObjRequest request) {
+		return taskService.getByObjWithName(request);
 	}
 }

@@ -1,5 +1,6 @@
 package com.codeshu.service;
 
+import com.codeshu.controller.GetByObjRequest;
 import com.codeshu.entity.TaskEntity;
 
 import java.util.List;
@@ -14,5 +15,9 @@ public interface TaskService {
 
 	List<TaskEntity> getAllByPlanType(Integer planType);
 
-	List<TaskEntity> getByMap(Map<String,Object> params);
+	List<TaskEntity> getByMap(Map<String, Object> params);
+
+	List<TaskEntity> getByObj(GetByObjRequest request);
+
+	List<TaskEntity> getByObjWithName(GetByObjRequest request);
 }
