@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.codeshu.mapper.DeptMapper">
+    <resultMap id="deptMap" type="com.codeshu.entity.DeptEntity">
+        <id column="id" property="id"/>
+        <result column="dept_name" property="deptName"/>
+    </resultMap>
+
+    <select id="selectAll" resultMap="deptMap">
+        SELECT id, dept_name
+        FROM dept;
+    </select>
+
+    <select id="selectById" resultMap="deptMap">
+        SELECT id, dept_name
+        FROM dept
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectInUserId" resultMap="deptMap">
+        SELECT id, dept_name
+        FROM dept
+        WHERE id IN (SELECT DISTINCT dept_id FROM user)
+    </select>
+
+    <select id="selectInUserId2" resultMap="deptMap">
+        SELECT id, dept_name
+        FROM dept WHERE id IN (
+        SELECT DISTINCT dept_id FROM user
+        WHERE id IN
+        <foreach collection="userIds" open="(" item="userId" separator=","
+                 close=")">
+            #{userId}
+        </foreach>
+        )
+    </select>
+
+    <select id="selectByIds" resultMap="deptMap">
+        SELECT id,dept_name
+        FROM dept
+        WHERE id IN
+        <foreach collection="ids" open="(" item="id" separator=","
+                 close=")">
+            #{id}
+        </foreach>
+    </select>
+</mapper>
