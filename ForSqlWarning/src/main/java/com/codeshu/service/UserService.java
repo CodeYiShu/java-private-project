@@ -2,6 +2,7 @@ package com.codeshu.service;
 
 import com.codeshu.entity.UserEntity;
 import com.codeshu.response.UserWithDeptNameResponse;
+import com.codeshu.response.UserWithPostResponse;
 
 import java.util.List;
 
@@ -40,4 +41,9 @@ public interface UserService {
 	 * 优化写法4：根据当前主查询数据，得到关联数据的ID，使用IN关键字查询关联数据
 	 */
 	List<UserWithDeptNameResponse> getUserWithDeptNameOptimize4();
+
+	/**
+	 * 获取用户信息，且其所有岗位信息
+	 */
+	List<UserWithPostResponse> getUserWithPost();
 }
