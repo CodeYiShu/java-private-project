@@ -25,7 +25,7 @@ public class TimeConvertUtils {
 
 	/**
 	 * 根据时间范围获取这段时间每一周的第一天和最后一天
-	 * 根据时间范围获取这段时间每一月的第一天和最后一天
+	 * 根据时间范围获取这段时间每一月的第一天和最后一天（28、29、30或31号）
 	 *
 	 * @param statisticsType 类型 week month
 	 * @param map            startDate和endDate，都为yyyy-MM-dd
