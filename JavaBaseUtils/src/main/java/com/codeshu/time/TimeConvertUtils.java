@@ -18,7 +18,9 @@ import java.util.Map;
  * @date 2022/11/15 9:21
  */
 public class TimeConvertUtils {
-
+	private static final String START_DATE = "startDate";
+	private static final String END_DATE = "endDate";
+	private static final String LONG_FORMAT = "yyyy-MM-dd";
 	//===================================================根据时间范围获取第一天和最后一天===================================================
 
 	/**
@@ -28,55 +30,63 @@ public class TimeConvertUtils {
 	 * @param statisticsType 类型 week month
 	 * @param map            startDate和endDate，都为yyyy-MM-dd
 	 * @return 结果，相邻两个元素为一对
+	 *
+	 * 注意点：
+	 * （1）对于周类型，startDate必须是周一，endDate必须是周日
+	 * （2）对于月类型，startDate必须是一号，endDate最好是月末
 	 */
-	public static List<String> rangeFirstAndEndDate(String statisticsType, Map<String, String> map) throws ParseException {
+	public static List<String> rangeFirstAndEndDate(String statisticsType, Map<String, Object> map) {
 		List<String> listWeekOrMonth = new ArrayList<>();
-		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		String startDate = map.get("startDate");
-		String endDate = map.get("endDate");
-		Date sDate = dateFormat.parse(startDate);
-		Calendar sCalendar = Calendar.getInstance();
-		sCalendar.setFirstDayOfWeek(Calendar.MONDAY);
-		sCalendar.setTime(sDate);
-		Date eDate = dateFormat.parse(endDate);
-		Calendar eCalendar = Calendar.getInstance();
-		eCalendar.setFirstDayOfWeek(Calendar.MONDAY);
-		eCalendar.setTime(eDate);
-		boolean bool = true;
-		//取每一周的第一天和最后一天
-		if ("week".equals(statisticsType)) {
-			while (sCalendar.getTime().getTime() < eCalendar.getTime().getTime()) {
-				if (bool || sCalendar.get(Calendar.DAY_OF_WEEK) == 2 || sCalendar.get(Calendar.DAY_OF_WEEK) == 1) {
-					listWeekOrMonth.add(dateFormat.format(sCalendar.getTime()));
-					bool = false;
+		try {
+			DateFormat dateFormat = new SimpleDateFormat(LONG_FORMAT);
+			String startDate = (String) map.get(START_DATE);
+			String endDate = (String) map.get(END_DATE);
+			Date sDate = dateFormat.parse(startDate);
+			Calendar sCalendar = Calendar.getInstance();
+			sCalendar.setFirstDayOfWeek(Calendar.MONDAY);
+			sCalendar.setTime(sDate);
+			Date eDate = dateFormat.parse(endDate);
+			Calendar eCalendar = Calendar.getInstance();
+			eCalendar.setFirstDayOfWeek(Calendar.MONDAY);
+			eCalendar.setTime(eDate);
+			boolean bool = true;
+			//取每一周的第一天和最后一天
+			if ("week".equals(statisticsType)) {
+				while (sCalendar.getTime().getTime() < eCalendar.getTime().getTime()) {
+					if (bool || sCalendar.get(Calendar.DAY_OF_WEEK) == 2 || sCalendar.get(Calendar.DAY_OF_WEEK) == 1) {
+						listWeekOrMonth.add(dateFormat.format(sCalendar.getTime()));
+						bool = false;
+					}
+					sCalendar.add(Calendar.DAY_OF_MONTH, 1);
 				}
-				sCalendar.add(Calendar.DAY_OF_MONTH, 1);
-			}
-			listWeekOrMonth.add(dateFormat.format(eCalendar.getTime()));
-			if (listWeekOrMonth.size() % 2 != 0) {
 				listWeekOrMonth.add(dateFormat.format(eCalendar.getTime()));
-			}
-		} else { //取每一月的第一天和最后一天
-			while (sCalendar.getTime().getTime() < eCalendar.getTime().getTime()) {
-				if (bool || sCalendar.get(Calendar.DAY_OF_MONTH) == 1 || sCalendar.get(Calendar.DAY_OF_MONTH) == sCalendar.getActualMaximum(Calendar.DAY_OF_MONTH)) {
-					listWeekOrMonth.add(dateFormat.format(sCalendar.getTime()));
-					bool = false;
+				if (listWeekOrMonth.size() % 2 != 0) {
+					listWeekOrMonth.add(dateFormat.format(eCalendar.getTime()));
 				}
-				sCalendar.add(Calendar.DAY_OF_MONTH, 1);
-			}
-			listWeekOrMonth.add(dateFormat.format(eCalendar.getTime()));
-			if (listWeekOrMonth.size() % 2 != 0) {
+			} else { //取每一月的第一天和最后一天
+				while (sCalendar.getTime().getTime() < eCalendar.getTime().getTime()) {
+					if (bool || sCalendar.get(Calendar.DAY_OF_MONTH) == 1 || sCalendar.get(Calendar.DAY_OF_MONTH) == sCalendar.getActualMaximum(Calendar.DAY_OF_MONTH)) {
+						listWeekOrMonth.add(dateFormat.format(sCalendar.getTime()));
+						bool = false;
+					}
+					sCalendar.add(Calendar.DAY_OF_MONTH, 1);
+				}
 				listWeekOrMonth.add(dateFormat.format(eCalendar.getTime()));
+				if (listWeekOrMonth.size() % 2 != 0) {
+					listWeekOrMonth.add(dateFormat.format(eCalendar.getTime()));
+				}
 			}
-		}
 
-		//在每一组的第一天添加上00:00:00，最后一天添加上23:59:59
-		for (int i = 0; i < listWeekOrMonth.size(); i++) {
-			if (i % 2 == 0) {
-				listWeekOrMonth.set(i, listWeekOrMonth.get(i) + " 00:00:00");
-				continue;
+			//在每一组的第一天添加上00:00:00，最后一天添加上23:59:59
+			for (int i = 0; i < listWeekOrMonth.size(); i++) {
+				if (i % 2 == 0) {
+					listWeekOrMonth.set(i, listWeekOrMonth.get(i) + " 00:00:00");
+					continue;
+				}
+				listWeekOrMonth.set(i, listWeekOrMonth.get(i) + " 23:59:59");
 			}
-			listWeekOrMonth.set(i, listWeekOrMonth.get(i) + " 23:59:59");
+		} catch (Exception e) {
+			throw new RuntimeException("时间获取失败");
 		}
 		return listWeekOrMonth;
 	}
@@ -86,27 +96,30 @@ public class TimeConvertUtils {
 	/**
 	 * 获取指定范围的所有日期
 	 *
-	 * @param begin 开始时间
-	 * @param end   结束时间
+	 * @param begin 开始时间 yyyy-MM-dd
+	 * @param end   结束时间 yyyy-MM-dd
 	 * @return 此范围的所有日期，相邻两个元素为一对
 	 */
-	public static List<String> rangeAllDate(String begin, String end) throws ParseException {
+	public static List<String> rangeAllDate(String begin, String end) {
 		List<String> listWeekOrMonth = new ArrayList<>();
-		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		Date sDate = dateFormat.parse(begin);
-		Calendar sCalendar = Calendar.getInstance();
-		sCalendar.setFirstDayOfWeek(Calendar.MONDAY);
-		sCalendar.setTime(sDate);
-		Date eDate = dateFormat.parse(end);
-		Calendar eCalendar = Calendar.getInstance();
-		eCalendar.setFirstDayOfWeek(Calendar.MONDAY);
-		eCalendar.setTime(eDate);
-		boolean bool = true;
+		try {
+			DateFormat dateFormat = new SimpleDateFormat(LONG_FORMAT);
+			Date sDate = dateFormat.parse(begin);
+			Calendar sCalendar = Calendar.getInstance();
+			sCalendar.setFirstDayOfWeek(Calendar.MONDAY);
+			sCalendar.setTime(sDate);
+			Date eDate = dateFormat.parse(end);
+			Calendar eCalendar = Calendar.getInstance();
+			eCalendar.setFirstDayOfWeek(Calendar.MONDAY);
+			eCalendar.setTime(eDate);
 
-		while (sCalendar.getTime().getTime() <= eCalendar.getTime().getTime()) {
-			listWeekOrMonth.add(dateFormat.format(sCalendar.getTime()) + " 00:00:00");
-			listWeekOrMonth.add(dateFormat.format(sCalendar.getTime()) + " 23:59:59");
-			sCalendar.add(Calendar.DAY_OF_MONTH, 1);
+			while (sCalendar.getTime().getTime() <= eCalendar.getTime().getTime()) {
+				listWeekOrMonth.add(dateFormat.format(sCalendar.getTime()) + " 00:00:00");
+				listWeekOrMonth.add(dateFormat.format(sCalendar.getTime()) + " 23:59:59");
+				sCalendar.add(Calendar.DAY_OF_MONTH, 1);
+			}
+		} catch (Exception e) {
+			throw new RuntimeException("时间获取失败");
 		}
 		return listWeekOrMonth;
 	}
