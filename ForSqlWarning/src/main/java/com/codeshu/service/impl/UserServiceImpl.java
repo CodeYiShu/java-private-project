@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * @author CodeShu
@@ -147,7 +148,12 @@ public class UserServiceImpl implements UserService {
 		List<UserEntity> userEntityList = userMapper.selectAll();
 		//2、根据当前用户数据，得到关联数据的部门ID
 		List<Long> deptIds = new ArrayList<>();
-		userEntityList.forEach(userEntity -> deptIds.add(userEntity.getDeptId()));
+		userEntityList.forEach(userEntity -> {
+			//注意判空，否则会将null存入List集合
+			if (Objects.nonNull(userEntity.getDeptId())) {
+				deptIds.add(userEntity.getDeptId());
+			}
+		});
 
 		//3、查询出被当前API所需要的用户，所关联的所有部门（关联数据）
 		List<DeptEntity> deptEntityList = deptService.getByIds(deptIds);
@@ -190,10 +196,13 @@ public class UserServiceImpl implements UserService {
 			if (Objects.isNull(userPostMap.get(userId))) {
 				userPostMap.put(userId, new ArrayList<>());
 			}
-			userPostMap.get(userId).add(postId);
+			//注意判断，否则会将null存入List集合
+			if (Objects.nonNull(postId)) {
+				userPostMap.get(userId).add(postId);
+			}
 		});
 
-		//4、批量查询出关联的岗位
+		//5、批量查询出关联的岗位
 		List<PostEntity> postEntityList = postService.getByIds(postIds);
 
 		for (UserEntity userEntity : userEntityList) {
@@ -201,7 +210,7 @@ public class UserServiceImpl implements UserService {
 			response.setPostIds(new ArrayList<>());
 			response.setPostNames(new ArrayList<>());
 
-			//5、从Map中获取出当前用户的所有岗位ID
+			//6、从Map中获取出当前用户的所有岗位ID
 			List<Long> currentPostIds = userPostMap.get(userEntity.getId());
 			if (!currentPostIds.isEmpty()) {
 				for (PostEntity postEntity : postEntityList) {
