@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.codeshu.mapper.ShopActivityMapper">
+    <resultMap id="shopActivityMap" type="com.codeshu.entity.ShopActivityEntity">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="type" property="type"/>
+        <result column="open_time" property="openTime"/>
+    </resultMap>
+
+    <select id="selectAll" resultMap="shopActivityMap">
+        SELECT id,name,type,open_time
+        FROM shop_activity
+    </select>
+
+    <select id="getOrderAndRange" resultType="com.codeshu.response.GetOrderAndRangeResponse">
+        SELECT type,COUNT(*) as count
+        FROM shop_activity
+        WHERE DATE_FORMAT(open_time,'%Y-%m-%d') BETWEEN #{startDate} AND #{endDate}
+        GROUP BY type
+        ORDER BY count desc
+        LIMIT 3
+    </select>
+
+    <select id="getRange" resultType="com.codeshu.response.GetRangeSingleResponse">
+        select DATE_FORMAT(open_time,"%Y-%m-%d") as date,type,count(*) as count
+        from shop_activity
+        where DATE_FORMAT(open_time,"%Y-%m-%d") between #{startDate} and #{endDate}
+        group by DATE_FORMAT(open_time,"%Y-%m-%d"),type
+        order by DATE_FORMAT(open_time,"%Y-%m-%d") asc
+    </select>
+</mapper>
