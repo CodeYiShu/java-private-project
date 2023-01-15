@@ -46,4 +46,10 @@ public interface UserService {
 	 * 获取用户信息，且其所有岗位信息
 	 */
 	List<UserWithPostResponse> getUserWithPost();
+
+	/**
+	 * 获取用户信息，且其所有岗位信息
+	 * 另一种写法
+	 */
+	List<UserWithPostResponse> getUserWithPost2();
 }

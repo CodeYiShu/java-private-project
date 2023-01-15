@@ -186,7 +186,7 @@ public class UserServiceImpl implements UserService {
 		//3、根据用户ID集合查询出关联的所有岗位关联关系
 		List<UserPostEntity> userPostEntityList = userPostService.getByUserIds(userIds);
 
-		//4、收集岗位ID，和建立用户和岗位关联的Map
+		//4、收集岗位ID，和建立用户和岗位关联的Map（key是用户ID，value是岗位ID集合）
 		Set<Long> postIds = new LinkedHashSet<>();
 		Map<Long, List<Long>> userPostMap = new HashMap<>();
 		userPostEntityList.forEach(userPostEntity -> {
@@ -213,11 +213,72 @@ public class UserServiceImpl implements UserService {
 			//6、从Map中获取出当前用户的所有岗位ID
 			List<Long> currentPostIds = userPostMap.get(userEntity.getId());
 			if (!currentPostIds.isEmpty()) {
+				//遍历批量查询的岗位数据，只要当前用户的所有岗位ID包含当前匹配到的岗位数据ID，那么就是此用户的岗位数据
 				for (PostEntity postEntity : postEntityList) {
 					if (currentPostIds.contains(postEntity.getId())) {
 						response.getPostIds().add(postEntity.getId());
 						response.getPostNames().add(postEntity.getPostName());
 					}
+				}
+			}
+			responseList.add(response);
+		}
+
+		return responseList;
+	}
+
+	@Override
+	public List<UserWithPostResponse> getUserWithPost2() {
+		List<UserWithPostResponse> responseList = new ArrayList<>();
+
+		//1、获取所有用户
+		List<UserEntity> userEntityList = userMapper.selectAll();
+
+		//2、收集这些用户的ID
+		List<Long> userIds = new ArrayList<>();
+		userEntityList.forEach(userEntity -> userIds.add(userEntity.getId()));
+
+		//3、根据用户ID集合查询出关联的所有岗位关联关系
+		List<UserPostEntity> userPostEntityList = userPostService.getByUserIds(userIds);
+
+		//4、收集岗位ID
+		Set<Long> postIds = new LinkedHashSet<>();
+		userPostEntityList.forEach(userPostEntity -> {
+			if (Objects.nonNull(userPostEntity.getPostId())) {
+				postIds.add(userPostEntity.getPostId());
+			}
+		});
+		//5、批量查询出关联的岗位
+		List<PostEntity> postEntityList = postService.getByIds(postIds);
+
+		//6、建立用户和岗位关联的Map（key是用户ID，value是岗位对象集合）！！！
+		Map<Long, List<PostEntity>> userPostMap = new HashMap<>();
+		userPostEntityList.forEach(userPostEntity -> {
+			Long userId = userPostEntity.getUserId();
+			Long postId = userPostEntity.getPostId();
+			if (Objects.isNull(userPostMap.get(userId))) {
+				userPostMap.put(userId, new ArrayList<>());
+			}
+			//遍历批量查询出来的岗位对象集合，进行ID的匹配
+			for (PostEntity postEntity : postEntityList) {
+				if (postEntity.getId().equals(postId)){
+					userPostMap.get(userId).add(postEntity);
+				}
+			}
+		});
+
+		for (UserEntity userEntity : userEntityList) {
+			UserWithPostResponse response = ConvertUtils.sourceToTarget(userEntity, UserWithPostResponse.class);
+			response.setPostIds(new ArrayList<>());
+			response.setPostNames(new ArrayList<>());
+
+			//7、从Map中获取出当前用户的所有岗位ID
+			List<PostEntity> postEntities = userPostMap.get(userEntity.getId());
+			if (!postEntities.isEmpty()) {
+				//此集合就是当前用户的岗位数据
+				for (PostEntity postEntity : postEntities) {
+					response.getPostIds().add(postEntity.getId());
+					response.getPostNames().add(postEntity.getPostName());
 				}
 			}
 			responseList.add(response);

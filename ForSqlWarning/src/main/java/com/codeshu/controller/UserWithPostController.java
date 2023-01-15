@@ -19,6 +19,6 @@ public class UserWithPostController {
 
 	@GetMapping("/getUserWithPost")
 	public List<UserWithPostResponse> getUserWithPost() {
-		return userService.getUserWithPost();
+		return userService.getUserWithPost2();
 	}
 }
