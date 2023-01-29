@@ -40,10 +40,17 @@
     <select id="selectByIds" resultMap="deptMap">
         SELECT id,dept_name
         FROM dept
-        WHERE id IN
-        <foreach collection="ids" open="(" item="id" separator=","
-                 close=")">
-            #{id}
-        </foreach>
+        <where>
+            <choose>
+                <when test="ids != null and ids.size > 0">
+                    id IN
+                    <foreach collection="ids" open="(" item="id" separator=","
+                             close=")">
+                        #{id}
+                    </foreach>
+                </when>
+                <otherwise>1=0</otherwise>
+            </choose>
+        </where>
     </select>
 </mapper>

@@ -11,10 +11,17 @@
 
     <select id="selectByUserIds" resultMap="userPostMap">
         SELECT * FROM user_post
-        WHERE user_id IN
-        <foreach collection="userIds" open="(" item="userId" separator=","
-                 close=")">
-            #{userId}
-        </foreach>
+        <where>
+            <choose>
+                <when test="userIds != null and userIds.size > 0">
+                    user_id IN
+                    <foreach collection="userIds" open="(" item="userId" separator=","
+                             close=")">
+                        #{userId}
+                    </foreach>
+                </when>
+                <otherwise>1 = 0</otherwise>
+            </choose>
+        </where>
     </select>
 </mapper>
