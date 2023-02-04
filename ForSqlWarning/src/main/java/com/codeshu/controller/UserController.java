@@ -28,7 +28,7 @@ public class UserController {
 		//return userService.getUserWithDeptName();
 		//return userService.getUserWithDeptNameOptimize1();
 		//return userService.getUserWithDeptNameOptimize2();
-		return userService.getUserWithDeptNameOptimize3();
-		//return userService.getUserWithDeptNameOptimize4();
+		//return userService.getUserWithDeptNameOptimize3();
+		return userService.getUserWithDeptNameOptimize4();
 	}
 }

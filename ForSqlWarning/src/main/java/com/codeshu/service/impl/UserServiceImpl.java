@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Consumer;
 
 /**
  * @author CodeShu
@@ -154,6 +153,8 @@ public class UserServiceImpl implements UserService {
 				deptIds.add(userEntity.getDeptId());
 			}
 		});
+		//也可以使用Stream实现
+		//List<Long> deptIds = userEntityList.stream().map(UserEntity::getDeptId).distinct().filter(Objects::nonNull).collect(Collectors.toList());
 
 		//3、查询出被当前API所需要的用户，所关联的所有部门（关联数据）
 		List<DeptEntity> deptEntityList = deptService.getByIds(deptIds);
@@ -163,7 +164,7 @@ public class UserServiceImpl implements UserService {
 			UserWithDeptNameResponse response = ConvertUtils.sourceToTarget(userEntity, UserWithDeptNameResponse.class);
 			//5、嵌套遍历所有部门，根据用户中的deptId，匹配当前遍历的部门id，匹配到则将部门名称设置给响应对象
 			deptEntityList.forEach(deptEntity -> {
-				if (userEntity.getDeptId().equals(deptEntity.getId())) {
+				if (deptEntity.getId().equals(userEntity.getDeptId())) {
 					response.setDeptName(deptEntity.getDeptName());
 				}
 			});
@@ -261,7 +262,7 @@ public class UserServiceImpl implements UserService {
 			}
 			//遍历批量查询出来的岗位对象集合，进行ID的匹配
 			for (PostEntity postEntity : postEntityList) {
-				if (postEntity.getId().equals(postId)){
+				if (postEntity.getId().equals(postId)) {
 					userPostMap.get(userId).add(postEntity);
 				}
 			}
