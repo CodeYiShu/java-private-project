@@ -5,11 +5,13 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.codeshu.stream.brean.Employee.getEmployees;
@@ -110,7 +112,25 @@ public class CenterStreamTest {
 	}
 
 	@Test
-	public void testMap(){
+	public void testMap1(){
+		List<Employee> employees = getEmployees();
+		Stream<Integer> idStream = employees.stream().map(new Function<Employee, Integer>() {
+			@Override
+			public Integer apply(Employee employee) {
+				//跳过对象为NULL的元素
+				if (employee != null){
+					return employee.getId();
+				}
+				return null;
+			}
+		});
+		//过滤id属性为NULL的元素
+		Stream<Integer> filterStream = idStream.filter(id -> id != null);
+		filterStream.forEach(id -> System.out.println(id));
+	}
+
+	@Test
+	public void testMap2(){
 		List<Employee> employees = getEmployees();
 		Stream<Integer> idStream = employees.stream().map(employee -> {
 			if (employee != null && employee.getId() != null){
@@ -121,6 +141,44 @@ public class CenterStreamTest {
 		Stream<Integer> filterStream = idStream.filter(id -> id != null);
 		Stream<Integer> sorted = filterStream.sorted((o1, o2) -> o2 - o1);
 		sorted.forEach(id -> System.out.println(id));
+	}
+
+	@Test
+	public void test1(){
+		List<Employee> employees = getEmployees();
+
+		//用两个filter进行过滤，先对存储Employee对象的集合过滤掉为NULL的元素
+		//再对此集合进行map筛选出对象的ID属性，最后对存储ID属性的集合进行过滤掉为NULL的元素
+
+		List<Integer> collect1 = employees.stream().filter(new Predicate<Employee>() {
+			@Override
+			public boolean test(Employee employee) {
+				return Objects.nonNull(employee);
+			}
+		}).map(new Function<Employee, Integer>() {
+			@Override
+			public Integer apply(Employee employee) {
+				return employee.getId();
+			}
+		}).filter(new Predicate<Integer>() {
+			@Override
+			public boolean test(Integer id) {
+				return Objects.nonNull(id);
+			}
+		}).collect(Collectors.toList());
+
+		List<Integer> collect2 = employees.stream().filter(employee -> Objects.nonNull(employee)).
+				map(employee -> employee.getId()).filter(id -> Objects.nonNull(id)).collect(Collectors.toList());
+
+		List<Integer> collect3 = employees.stream().filter(Objects::nonNull).
+				map(Employee::getId).filter(Objects::nonNull).collect(Collectors.toList());
+
+		List<Integer> collect4 = employees.stream().filter(employee -> Objects.nonNull(employee) && Objects.nonNull(employee.getId()))
+				.map(employee -> employee.getId()).collect(Collectors.toList());
+
+		System.out.println(collect1);
+		System.out.println(collect2);
+		System.out.println(collect3);
 	}
 
 }
