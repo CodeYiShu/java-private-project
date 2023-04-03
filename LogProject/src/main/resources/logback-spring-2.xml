@@ -1,0 +1,45 @@
+<!--控制台不打印，直接输出到日志文件
+    缺点：
+        1、控制台中将只会打印出banner之后就啥也不打印了，所有的启动信息都会被打印在日志文件中
+        2、实际上我们不希望业务日志中会包括这些启动信息
+-->
+
+<configuration>
+    <!-- 变量：在application.properties文件中找到对应的配置项 -->
+    <springProperty scope="context" name="logging.path" source="logging.path"/>
+    <springProperty scope="context" name="logging.level" source="logging.level.com.glmapper.spring.boot"/>
+
+    <!-- 附加器1：负责输出到控制台 -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>%d{HH:mm:ss.SSS} %-5level %logger{80} - %msg%n</Pattern>
+        </encoder>
+    </appender>
+
+    <!-- 附加器2：负责输出到文件 -->
+    <appender name="GLMAPPER-LOGGERONE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <append>true</append>
+        <!--过滤掉低于配置文件中所配置的日志级别的日志-->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>${logging.level}</level>
+        </filter>
+        <!--日志输出的路径和文件-->
+        <file>
+            ${logging.path}/codeshu.log
+        </file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${logging.path}/glmapper-spring-boot/glmapper-loggerone.log.%d{yyyy-MM-dd}
+            </FileNamePattern>
+            <MaxHistory>30</MaxHistory>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <root level="info">
+        <!--  指定输出到文件的附加器，不指定输出到控制台的附加器，故不会打印到控制台 -->
+        <appender-ref ref="GLMAPPER-LOGGERONE"/>
+    </root>
+</configuration>
