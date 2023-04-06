@@ -1,14 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <include resource="org/springframework/boot/logging/logback/base.xml" />
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    <!--Logstash地址 在application.properties中进行配置-->
+    <springProperty scope="context" name="logging.logstash.address" source="logging.logstash.address"/>
 
+    <!--Logstash附加器：负责将日志推往Logstash服务-->
     <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-        <destination>175.178.113.82:9061</destination>
-        <encoder charset="UTF-8" class="net.logstash.logback.encoder.LogstashEncoder" />
+        <destination>${logging.logstash.address}</destination>
+        <encoder charset="UTF-8" class="net.logstash.logback.encoder.LogstashEncoder"/>
     </appender>
 
     <root level="INFO">
-        <appender-ref ref="LOGSTASH" />
-        <appender-ref ref="CONSOLE" />
+        <!--推往Logstash服务-->
+        <appender-ref ref="LOGSTASH"/>
+        <!--打印控制台-->
+        <appender-ref ref="CONSOLE"/>
     </root>
 </configuration>
