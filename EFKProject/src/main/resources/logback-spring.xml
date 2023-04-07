@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    <appender name="FLUENT" class="ch.qos.logback.more.appenders.DataFluentAppender">
+        <tag>myapp</tag>
+        <label>springboot</label>
+        <remoteHost>192.168.137.111</remoteHost>
+        <port>24224</port>
+        <encoder>
+            <pattern>%date [%level] [%thread] %logger{80} [%file : %line] %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <!--推往Logstash服务-->
+        <appender-ref ref="FLUENT"/>
+        <!--打印控制台-->
+        <appender-ref ref="CONSOLE"/>
+    </root>
+</configuration>
