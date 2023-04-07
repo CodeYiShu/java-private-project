@@ -21,6 +21,7 @@ public class GenerateLogController {
 		LOGGER.info("GenerateLogController:info");
 		LOGGER.warn("GenerateLogController:warn");
 		LOGGER.error("GenerateLogController:error");
+		int i = 1/0;
 		return "success";
 	}
 }

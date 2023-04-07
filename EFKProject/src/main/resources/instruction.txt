@@ -1,6 +1,9 @@
-地址1：https://www.macrozheng.com/mall/reference/mall_elk_advance.html#%E9%85%8D%E7%BD%AE%E8%A6%81%E7%82%B9%E8%A7%A3%E6%9E%90
-地址2：https://www.macrozheng.com/project/efk_fluent.html#%E7%BB%93%E5%90%88springboot%E4%BD%BF%E7%94%A8
-地址3：https://www.macrozheng.com/mall/reference/mall_elk_advance.html#%E5%AE%89%E8%A3%85%E8%A6%81%E7%82%B9
+地址1：https://www.macrozheng.com/mall/reference/mall_elk_advance.html
+地址2：https://www.macrozheng.com/project/efk_fluent.html
+地址3：https://www.macrozheng.com/mall/reference/mall_elk_advance.html
+
+安装方式1：文章中的Docker方式
+安装方式2：笔记Linux系统-Linux安装各种软件-安装ELK
 
 文章方案：
     1、调试日志：最全日志，包含了应用中所有DEBUG级别以上的日志，仅在开发、测试环境中开启收集；
@@ -9,7 +12,5 @@
     4、记录日志：每个接口的访问记录，可以用来查看接口执行效率，获取接口访问参数。
 
 本方案：
-    1、INFO日志，及以上级别的日志（无论是业务包下的日志还是系统日志），都输出到tag为info中
-    2、ERROR日志（无论是业务包下的日志还是系统日志），都输出到tag为error中
-    3、业务包的日志（无论DEBUG级别，及以上），都输出到tag为business中
-    4、所有的日志，都会输出到控制台中（无论系统日志还是业务包下的日志，无论是什么级别）
+    1、非ERROR日志，输出到tag为general中，索引是efk-general-logs-*
+    2、ERROR日志，输出到tag为error中，索引是efk-error-logs-*

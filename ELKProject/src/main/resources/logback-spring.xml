@@ -1,19 +1,111 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration>
 <configuration>
-    <include resource="org/springframework/boot/logging/logback/base.xml"/>
-    <!--Logstash地址 在application.properties中进行配置-->
-    <springProperty scope="context" name="logging.logstash.address" source="logging.logstash.address"/>
+    <!--
+        1、非ERROR日志，输出到tag为general中，索引是efk-general-logs-*
+        2、ERROR日志，输出到tag为error中，索引是efk-error-logs-*
+    -->
 
-    <!--Logstash附加器：负责将日志推往Logstash服务-->
-    <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-        <destination>${logging.logstash.address}</destination>
-        <encoder charset="UTF-8" class="net.logstash.logback.encoder.LogstashEncoder"/>
+    <!--引用默认日志配置-->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <!--使用默认的控制台日志输出实现-->
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+
+    <!--应用名称-->
+    <springProperty scope="context" name="APP_NAME" source="spring.application.name" defaultValue="springBoot"/>
+    <!--LOGSTASH地址-->
+    <springProperty name="LOGSTASH_HOST" scope="context" source="logstash.host" defaultValue="localhost"/>
+
+    <!--非ERROR日志输出到LOGSTASH-->
+    <appender name="LOGSTASH_GENERAL" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <!--过滤掉ERROR级别的日志，输出DEBUG、INFO、WARN级别的日志-->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>DENY</onMatch>
+            <onMismatch>ACCEPT</onMismatch>
+        </filter>
+        <destination>${LOGSTASH_HOST}:4560</destination>
+        <encoder charset="UTF-8" class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <timestamp>
+                    <timeZone>Asia/Shanghai</timeZone>
+                </timestamp>
+                <!--自定义日志输出格式-->
+                <pattern>
+                    <pattern>
+                        {
+                        "project": "JavaUtilsProject",
+                        "service": "${APP_NAME:-}",
+                        "level": "%level",
+                        "date": "%date{yyyy-MM-dd HH:mm:ss.SSS}",
+                        "pid": "${PID:-}",
+                        "thread": "%thread",
+                        "class": "%logger",
+                        "message": "%message",
+                        "stack_trace": "%exception{20}"
+                        }
+                    </pattern>
+                </pattern>
+            </providers>
+        </encoder>
+        <!--当有多个LOGSTASH服务时，设置访问策略为轮询-->
+        <connectionStrategy>
+            <roundRobin>
+                <connectionTTL>5 minutes</connectionTTL>
+            </roundRobin>
+        </connectionStrategy>
     </appender>
 
-    <root level="INFO">
-        <!--推往Logstash服务-->
-        <appender-ref ref="LOGSTASH"/>
-        <!--打印控制台-->
+    <!--ERROR日志输出到LOGSTASH-->
+    <appender name="LOGSTASH_ERROR" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <!--单独输出ERROR日志级别-->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <destination>${LOGSTASH_HOST}:4561</destination>
+        <encoder charset="UTF-8" class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <timestamp>
+                    <timeZone>Asia/Shanghai</timeZone>
+                </timestamp>
+                <!--自定义日志输出格式-->
+                <pattern>
+                    <pattern>
+                        {
+                        "project": "JavaUtilsProject",
+                        "service": "${APP_NAME:-}",
+                        "level": "%level",
+                        "date": "%date{yyyy-MM-dd HH:mm:ss.SSS}",
+                        "pid": "${PID:-}",
+                        "thread": "%thread",
+                        "class": "%logger",
+                        "message": "%message",
+                        "stack_trace": "%exception{20}"
+                        }
+                    </pattern>
+                </pattern>
+            </providers>
+        </encoder>
+        <!--当有多个LOGSTASH服务时，设置访问策略为轮询-->
+        <connectionStrategy>
+            <roundRobin>
+                <connectionTTL>5 minutes</connectionTTL>
+            </roundRobin>
+        </connectionStrategy>
+    </appender>
+
+    <!--控制框架输出日志：框架内部的日志，DEBUG级别的日志对我们并没有啥用处，都可以设置为INFO以上级别-->
+    <logger name="org.slf4j" level="INFO"/>
+    <logger name="springfox" level="INFO"/>
+    <logger name="io.swagger" level="INFO"/>
+    <logger name="org.springframework" level="INFO"/>
+    <logger name="org.hibernate.validator" level="INFO"/>
+
+    <root level="DEBUG">
         <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="LOGSTASH_GENERAL"/>
+        <appender-ref ref="LOGSTASH_ERROR"/>
     </root>
 </configuration>

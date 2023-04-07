@@ -1,0 +1,5 @@
+地址1：https://www.macrozheng.com/mall/reference/mall_tiny_elk.html
+地址2：https://www.macrozheng.com/mall/reference/mall_elk_advance.html
+
+安装方式1：文章中的Docker方式
+安装方式2：笔记Linux系统-Linux安装各种软件-安装ELK
