@@ -35,13 +35,17 @@
                     <pattern>
                         {
                         "project": "JavaUtilsProject",
-                        "level": "%level",
                         "service": "${APP_NAME:-}",
-                        "pid": "${PID:-}",
+                        "level": "%level",
                         "date": "%date{yyyy-MM-dd HH:mm:ss.SSS}",
+                        "pid": "${PID:-}",
                         "thread": "%thread",
                         "class": "%logger",
                         "message": "%message",
+                        "client_id": "%X{client.ip}",
+                        "client_request_uri": "%X{client.requestUri}",
+                        "client_request_method": "%X{client.requestMethod}",
+                        "client_request_params": "%X{client.requestParams}",
                         "stack_trace": "%exception{20}"
                         }
                     </pattern>
