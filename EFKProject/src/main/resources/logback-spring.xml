@@ -112,6 +112,38 @@
         </connectionStrategy>
     </appender>
 
+    <!--接口访问日志输出到FLUENTD-->
+    <appender name="FLUENTD_ACCESS" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <destination>${FLUENTD_HOST}:24223</destination>
+        <encoder charset="UTF-8" class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <timestamp>
+                    <timeZone>Asia/Shanghai</timeZone>
+                </timestamp>
+                <!--自定义日志输出格式-->
+                <pattern>
+                    <pattern>
+                        {
+                        "project": "JavaUtilsProject",
+                        "service": "${APP_NAME:-}",
+                        "level": "%level",
+                        "date": "%date{yyyy-MM-dd HH:mm:ss.SSS}",
+                        "thread": "%thread",
+                        "logger": "%logger",
+                        "message": "%message"
+                        }
+                    </pattern>
+                </pattern>
+            </providers>
+        </encoder>
+        <!--当有多个FLUENTD服务时，设置访问策略为轮询-->
+        <connectionStrategy>
+            <roundRobin>
+                <connectionTTL>5 minutes</connectionTTL>
+            </roundRobin>
+        </connectionStrategy>
+    </appender>
+
     <!--控制框架输出日志：框架内部的日志，DEBUG级别的日志对我们并没有啥用处，都可以设置为INFO以上级别-->
     <logger name="org.slf4j" level="INFO"/>
     <logger name="springfox" level="INFO"/>
@@ -124,4 +156,13 @@
         <appender-ref ref="FLUENTD_GENERAL"/>
         <appender-ref ref="FLUENTD_ERROR"/>
     </root>
+
+    <!--additivity为false
+        表示此包产生的日志只，只交给FLUENTD_ACCESS附加器去处理，不交给上面的FLUENTD_GENERAL和FLUENTD_ERROR
+        避免日志重复记录，也就是不让日志出现在多个索引上
+    -->
+    <logger name="com.codeshu.aspect" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FLUENTD_ACCESS"/>
+    </logger>
 </configuration>

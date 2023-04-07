@@ -14,3 +14,13 @@
 本方案：
     1、非ERROR日志，输出到tag为general中，索引是efk-general-logs-*
     2、ERROR日志，输出到tag为error中，索引是efk-error-logs-*
+
+
+效率低时的改进：
+    1、不要用栈信息
+       (1)去掉配置文件的<includeCallerData>true</includeCallerData>
+       (2)去掉以下的配置
+           "class": "%file",
+           "method": "%method:%line"
+       (3)不要用LogFormatUtils，他也会去获取栈信息
+    2、可以去掉RequestLoggingFilter过滤器
