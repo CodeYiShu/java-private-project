@@ -1,9 +1,12 @@
 package com.codeshu.controller;
 
+import cn.hutool.core.thread.ThreadUtil;
+import com.codeshu.annotation.LogInterface;
 import com.codeshu.utils.LogFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
@@ -37,6 +40,13 @@ public class GenerateLogController {
 		params.put("key3", "value3");
 		LogFormatUtils.printError(Thread.currentThread().getStackTrace()[1], params);
 
+		return "success";
+	}
+
+	@GetMapping("logAnnotation")
+	@LogInterface(value = "记录入接口请求")
+	public String logAnnotation(@RequestParam("name") String name, @RequestParam("age") Integer age) {
+		ThreadUtil.sleep(100);
 		return "success";
 	}
 }

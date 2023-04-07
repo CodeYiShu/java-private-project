@@ -1,4 +1,4 @@
-package com.codeshu.config;
+package com.codeshu.filter;
 
 import cn.hutool.json.JSONUtil;
 import com.codeshu.utils.IpUtils;
