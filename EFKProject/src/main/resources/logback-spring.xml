@@ -25,6 +25,8 @@
             <onMismatch>ACCEPT</onMismatch>
         </filter>
         <destination>${FLUENTD_HOST}:24221</destination>
+        <!--调用栈信息，便于展示%file、%method和%line，效率不高-->
+        <includeCallerData>true</includeCallerData>
         <encoder charset="UTF-8" class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
             <providers>
                 <timestamp>
@@ -40,7 +42,9 @@
                         "date": "%date{yyyy-MM-dd HH:mm:ss.SSS}",
                         "pid": "${PID:-}",
                         "thread": "%thread",
-                        "class": "%logger",
+                        "logger": "%logger",
+                        "class": "%file",
+                        "method": "%method:%line",
                         "message": "%message",
                         "client_id": "%X{client.ip}",
                         "client_request_uri": "%X{client.requestUri}",
@@ -69,6 +73,8 @@
             <onMismatch>DENY</onMismatch>
         </filter>
         <destination>${FLUENTD_HOST}:24222</destination>
+        <!--调用栈信息，便于展示%file、%method和%line，效率不高-->
+        <includeCallerData>true</includeCallerData>
         <encoder charset="UTF-8" class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
             <providers>
                 <timestamp>
@@ -84,7 +90,9 @@
                         "date": "%date{yyyy-MM-dd HH:mm:ss.SSS}",
                         "pid": "${PID:-}",
                         "thread": "%thread",
-                        "class": "%logger",
+                        "logger": "%logger",
+                        "class": "%file",
+                        "method": "%method:%line",
                         "message": "%message",
                         "client_id": "%X{client.ip}",
                         "client_request_uri": "%X{client.requestUri}",

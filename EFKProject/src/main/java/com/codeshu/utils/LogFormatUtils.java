@@ -8,6 +8,10 @@ import java.util.Objects;
 
 /**
  * 日志输出格式化封装
+ *
+ * <p>
+ * 获取栈信息，展示类、方法名等信息，可在logback配置文件进行配置替代
+ * 由于涉及获取栈信息，效率不高
  */
 public class LogFormatUtils {
 	private static final Logger LOGGER = LoggerFactory.getLogger(LogFormatUtils.class);
