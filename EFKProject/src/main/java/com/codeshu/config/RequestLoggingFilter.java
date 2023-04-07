@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- * 请求过滤器
+ * 请求过滤器，写入MDC，用于日志记录
  *
  * @author CodeShu
  * @date 2023/4/7 11:32
