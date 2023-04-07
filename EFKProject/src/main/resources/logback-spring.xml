@@ -1,20 +1,151 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration>
 <configuration>
-    <include resource="org/springframework/boot/logging/logback/base.xml"/>
-    <appender name="FLUENT" class="ch.qos.logback.more.appenders.DataFluentAppender">
-        <tag>myapp</tag>
-        <label>springboot</label>
-        <remoteHost>192.168.137.111</remoteHost>
-        <port>24224</port>
-        <encoder>
-            <pattern>%date [%level] [%thread] %logger{80} [%file : %line] %msg%n</pattern>
+    <!--
+        1、INFO日志，及以上级别的日志（无论是业务包下的日志还是系统日志），都输出到tag为info中
+        2、ERROR日志（无论是业务包下的日志还是系统日志），都输出到tag为error中
+        3、业务包的日志（无论DEBUG级别，及以上），都输出到tag为business中
+        4、所有的日志，都会输出到控制台中（无论系统日志还是业务包下的日志，无论是什么级别）
+    -->
+
+    <!--引用默认日志配置-->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <!--使用默认的控制台日志输出实现-->
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+
+    <!--应用名称-->
+    <springProperty scope="context" name="APP_NAME" source="spring.application.name" defaultValue="springBoot"/>
+    <!--FULENTD地址-->
+    <springProperty name="FULENTD_HOST" scope="context" source="fluentd.host" defaultValue="localhost"/>
+
+    <!--INFO日志输出到FULENTD-->
+    <appender name="FULENTD_INFO" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <!--过滤掉低于INFO级别的日志，即输出INFO级别及以上级别日志-->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+        <destination>${FULENTD_HOST}:24221</destination>
+        <encoder charset="UTF-8" class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <timestamp>
+                    <timeZone>Asia/Shanghai</timeZone>
+                </timestamp>
+                <!--自定义日志输出格式-->
+                <pattern>
+                    <pattern>
+                        {
+                        "project": "JavaUtilsProject",
+                        "level": "%level",
+                        "service": "${APP_NAME:-}",
+                        "pid": "${PID:-}",
+                        "date": "%date{yyyy-MM-dd HH:mm:ss.SSS}",
+                        "thread": "%thread",
+                        "class": "%logger",
+                        "message": "%message",
+                        "stack_trace": "%exception{20}"
+                        }
+                    </pattern>
+                </pattern>
+            </providers>
         </encoder>
+        <!--当有多个FULENTD服务时，设置访问策略为轮询-->
+        <connectionStrategy>
+            <roundRobin>
+                <connectionTTL>5 minutes</connectionTTL>
+            </roundRobin>
+        </connectionStrategy>
     </appender>
 
-    <root level="INFO">
-        <!--推往Logstash服务-->
-        <appender-ref ref="FLUENT"/>
-        <!--打印控制台-->
+    <!--ERROR日志输出到FULENTD-->
+    <appender name="FULENTD_ERROR" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <!--单独输出ERROR日志级别-->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <destination>${FULENTD_HOST}:24222</destination>
+        <encoder charset="UTF-8" class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <timestamp>
+                    <timeZone>Asia/Shanghai</timeZone>
+                </timestamp>
+                <!--自定义日志输出格式-->
+                <pattern>
+                    <pattern>
+                        {
+                        "project": "JavaUtilsProject",
+                        "level": "%level",
+                        "service": "${APP_NAME:-}",
+                        "pid": "${PID:-}",
+                        "date": "%date{yyyy-MM-dd HH:mm:ss.SSS}",
+                        "thread": "%thread",
+                        "class": "%logger",
+                        "message": "%message",
+                        "stack_trace": "%exception{20}"
+                        }
+                    </pattern>
+                </pattern>
+            </providers>
+        </encoder>
+        <!--当有多个FULENTD服务时，设置访问策略为轮询-->
+        <connectionStrategy>
+            <roundRobin>
+                <connectionTTL>5 minutes</connectionTTL>
+            </roundRobin>
+        </connectionStrategy>
+    </appender>
+
+    <!--业务日志输出到FULENTD-->
+    <appender name="FULENTD_BUSINESS" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <destination>${FULENTD_HOST}:24223</destination>
+        <encoder charset="UTF-8" class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <timestamp>
+                    <timeZone>Asia/Shanghai</timeZone>
+                </timestamp>
+                <!--自定义日志输出格式-->
+                <pattern>
+                    <pattern>
+                        {
+                        "project": "JavaUtilsProject",
+                        "level": "%level",
+                        "service": "${APP_NAME:-}",
+                        "pid": "${PID:-}",
+                        "date": "%date{yyyy-MM-dd HH:mm:ss.SSS}",
+                        "thread": "%thread",
+                        "class": "%logger",
+                        "message": "%message",
+                        "stack_trace": "%exception{20}"
+                        }
+                    </pattern>
+                </pattern>
+            </providers>
+        </encoder>
+        <!--当有多个FULENTD服务时，设置访问策略为轮询-->
+        <connectionStrategy>
+            <roundRobin>
+                <connectionTTL>5 minutes</connectionTTL>
+            </roundRobin>
+        </connectionStrategy>
+    </appender>
+
+    <!--控制框架输出日志：框架内部的日志，DEBUG级别的日志对我们并没有啥用处，都可以设置为INFO以上级别-->
+    <logger name="org.slf4j" level="INFO"/>
+    <logger name="springfox" level="INFO"/>
+    <logger name="io.swagger" level="INFO"/>
+    <logger name="org.springframework" level="INFO"/>
+    <logger name="org.hibernate.validator" level="INFO"/>
+
+    <!--项目日志：项目产生的所有日志，都打印到控制台；其中INFO和ERROR级别的还会输出到Fluentd-->
+    <root level="DEBUG">
         <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FULENTD_INFO"/>
+        <appender-ref ref="FULENTD_ERROR"/>
     </root>
+
+    <!--业务日志：在项目包下产生的DEBUG级别以上的日志-->
+    <logger name="com.codeshu" level="DEBUG">
+        <appender-ref ref="FULENTD_BUSINESS"/>
+    </logger>
 </configuration>
