@@ -14,7 +14,12 @@
 本方案：
     1、非ERROR日志，输出到tag为general中，索引是efk-general-logs-*
     2、ERROR日志，输出到tag为error中，索引是efk-error-logs-*
+    3、访问接口日志，输出到tag为access中，索引是efk-access-logs-*
 
+扩展：
+    1、LogInterfaceAspect：负责记录访问接口的性能，单独使用FLUENTD_ACCESS附加器，输出到24223端口，写入到efk-access-logs-*
+    2、RequestLoggingFilter：负责从栈信息中获取请求相关数据，性能不高
+    3、LogFormatUtils：统一message数据，也是调用栈信息，性能不高
 
 效率低时的改进：
     1、不要用栈信息
