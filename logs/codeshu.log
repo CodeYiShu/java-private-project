@@ -1,4 +1,4 @@
-2023-04-03 10:01:35.337 [main] INFO  com.codeshu.LogProjectApplication - Starting LogProjectApplication using Java 1.8.0_261 on CodeShu with PID 2844 (E:\java\program\JavaUtilsProject\LogProject\target\classes started by angus in E:\java\program\JavaUtilsProject)
+2023-04-03 10:01:35.337 [main] INFO  com.codeshu.LogProjectApplication - Starting LogProjectApplication using Java 1.8.0_261 on CodeShu with PID 2844 (E:\java\program\java-private-project\LogProject\target\classes started by angus in E:\java\program\java-private-project)
 2023-04-03 10:01:35.340 [main] INFO  com.codeshu.LogProjectApplication - No active profile set, falling back to default profiles: default
 2023-04-03 10:01:36.215 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port(s): 8080 (http)
 2023-04-03 10:01:36.224 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]

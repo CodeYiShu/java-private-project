@@ -36,7 +36,7 @@
                 <pattern>
                     <pattern>
                         {
-                        "project": "JavaUtilsProject",
+                        "project": "java-private-project",
                         "service": "${APP_NAME:-}",
                         "level": "%level",
                         "date": "%date{yyyy-MM-dd HH:mm:ss.SSS}",
@@ -84,7 +84,7 @@
                 <pattern>
                     <pattern>
                         {
-                        "project": "JavaUtilsProject",
+                        "project": "java-private-project",
                         "service": "${APP_NAME:-}",
                         "level": "%level",
                         "date": "%date{yyyy-MM-dd HH:mm:ss.SSS}",
@@ -124,7 +124,7 @@
                 <pattern>
                     <pattern>
                         {
-                        "project": "JavaUtilsProject",
+                        "project": "java-private-project",
                         "service": "${APP_NAME:-}",
                         "level": "%level",
                         "date": "%date{yyyy-MM-dd HH:mm:ss.SSS}",
