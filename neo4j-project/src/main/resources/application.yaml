@@ -1,0 +1,11 @@
+spring:
+  neo4j:
+    # 指定数据库地址和账号密码
+    uri: bolt://175.178.113.82:7687
+    authentication:
+      username: neo4j
+      password: 123456
+  # 指定数据库
+  data:
+    neo4j:
+      database: neo4j
