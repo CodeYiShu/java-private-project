@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.codeshu.test03.mapper.Test03UserMapper">
+    <select id="selectList" resultType="com.codeshu.test03.entity.Test03User">
+        select id, username, password
+        from sys_user
+    </select>
+</mapper>

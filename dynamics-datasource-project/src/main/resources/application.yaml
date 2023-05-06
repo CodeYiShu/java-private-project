@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/test01?serverTimezone=Asia/Shanghai&allowMultiQueries=true
+    username: root
+    password: 123456
+
+dynamic-datasource:
+  test02:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/test02?serverTimezone=Asia/Shanghai&allowMultiQueries=true
+    username: root
+    password: 123456
+  test03:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/test03?serverTimezone=Asia/Shanghai&allowMultiQueries=true
+    username: root
+    password: 123456
