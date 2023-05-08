@@ -1,0 +1,31 @@
+spring:
+  datasource:
+    druid:
+      #主数据源
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://127.0.0.1:3306/test01?useUnicode=true&characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai&nullCatalogMeansCurrent=true&allowMultiQueries=true
+      username: root
+      password: 123456
+
+# 从配置源
+dynamic:
+  datasource:
+    test02:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://127.0.0.1:3306/test02?useUnicode=true&characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai&nullCatalogMeansCurrent=true&allowMultiQueries=true
+      username: root
+      password: 123456
+    test03:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://127.0.0.1:3306/test03?useUnicode=true&characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai&nullCatalogMeansCurrent=true&allowMultiQueries=true
+      username: root
+      password: 123456
+
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  typeAliasesPackage: com.codeshu.entity
+  global-config:
+    db-config:
+      #主键的类型
+      id-type: ASSIGN_ID
+    banner: false
