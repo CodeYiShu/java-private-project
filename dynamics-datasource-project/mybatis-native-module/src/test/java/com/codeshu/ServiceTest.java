@@ -29,7 +29,7 @@ public class ServiceTest {
 
 
 	@Test
-	public void insertTest(){
+	public void selectTest(){
 		List<User> list = userMapper.selectList();
 		list.forEach(System.out::println);
 
