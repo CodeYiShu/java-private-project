@@ -33,7 +33,9 @@ public class BenTiEntity {
 	private String name;
 
 
-	// 多个属性作为弧尾，指向当前本体
+	/**
+	 * 多个属性作为弧尾，指向当前本体
+	 */
 	@Relationship(type = "ATTRIBUTE_IN", direction = Relationship.Direction.INCOMING)
-	private List<AttributeEntity> attributeEntityList = new ArrayList<>();
+	private List<AttributeEntity> attributeList = new ArrayList<>();
 }

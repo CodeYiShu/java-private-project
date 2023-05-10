@@ -31,9 +31,13 @@ public class BenTiRequest {
 	 */
 	private String relationshipType;
 
-	// 多个属性作为弧尾，指向当前本体
-	private List<AttributeEntity> attributeEntityList = new ArrayList<>();
+	/**
+	 * 多个属性作为弧尾，指向当前本体
+	 */
+	private List<AttributeEntity> attributeList = new ArrayList<>();
 
-	// 当前节点作为弧尾，指向其他本体节点
-	private List<BenTiRequest> endBenTiEntityList = new ArrayList<>();
+	/**
+	 * 当前节点作为弧尾，指向其他本体节点
+	 */
+	private List<BenTiRequest> endBenTiList = new ArrayList<>();
 }

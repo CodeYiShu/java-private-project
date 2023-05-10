@@ -40,14 +40,14 @@ class YunShuoTest {
 		List<BenTiRequest> requestList = getBenTiEntityHasId();
 
 		//查询出库中所有这些本体节点
-		List<Long> ids = requestList.stream().map(BenTiRequest::getId).filter(Objects::nonNull).collect(Collectors.toList());
-		List<BenTiEntity> DbBenTiEntityList = benTiRepository.findAllById(ids);
+		List<Long> benTiIds = requestList.stream().map(BenTiRequest::getId).filter(Objects::nonNull).collect(Collectors.toList());
+		List<BenTiEntity> dbBenTiEntityList = benTiRepository.findAllById(benTiIds);
 		//获取这些本体节点的所有属性节点
-		List<List<AttributeEntity>> attributeEntityLists = DbBenTiEntityList.stream().map(BenTiEntity::getAttributeEntityList)
+		List<List<AttributeEntity>> dbAttributeList = dbBenTiEntityList.stream().map(BenTiEntity::getAttributeList)
 				.filter(Objects::nonNull).collect(Collectors.toList());
 		List<Long> allAttributeIds = new ArrayList<>();
-		for (List<AttributeEntity> attributeEntityList : attributeEntityLists) {
-			List<Long> attributeIds = attributeEntityList.stream().map(AttributeEntity::getId).filter(Objects::nonNull).collect(Collectors.toList());
+		for (List<AttributeEntity> attributeList : dbAttributeList) {
+			List<Long> attributeIds = attributeList.stream().map(AttributeEntity::getId).filter(Objects::nonNull).collect(Collectors.toList());
 			allAttributeIds.addAll(attributeIds);
 		}
 		//删除这些本体节点的属性节点
@@ -79,15 +79,15 @@ class YunShuoTest {
 
 		for (BenTiRequest request : requestList) {
 			//获取当前本体节点的所有弧头本体节点
-			List<BenTiRequest> endBenTiEntityList = request.getEndBenTiEntityList();
-			for (BenTiRequest endBenTiEntity : endBenTiEntityList) {
+			List<BenTiRequest> endBenTiRequestList = request.getEndBenTiList();
+			for (BenTiRequest endBenTiRequest : endBenTiRequestList) {
 				//根据节点名称，将 id 字段值设置进弧头本体节点的 id 字段中
-				Long id = requestList.stream().filter(entity -> entity.getName().equals(endBenTiEntity.getName()))
+				Long id = requestList.stream().filter(entity -> entity.getName().equals(endBenTiRequest.getName()))
 						.map(BenTiRequest::getId).filter(Objects::nonNull).findFirst().orElse(null);
-				endBenTiEntity.setId(id);
+				endBenTiRequest.setId(id);
 
 				//参数填充入cypher中
-				String format = String.format(str, request.getId(), endBenTiEntity.getId(), endBenTiEntity.getRelationshipType());
+				String format = String.format(str, request.getId(), endBenTiRequest.getId(), endBenTiRequest.getRelationshipType());
 				cypherList.add(format);
 			}
 		}
@@ -107,7 +107,7 @@ class YunShuoTest {
 			if (Objects.isNull(request.getId())) {
 				request.setId(snowflake.nextId());
 			}
-			List<AttributeEntity> attributeEntityList = request.getAttributeEntityList();
+			List<AttributeEntity> attributeEntityList = request.getAttributeList();
 			//为所有属性节点添加上 id
 			for (AttributeEntity attributeEntity : attributeEntityList) {
 				attributeEntity.setId(snowflake.nextId());
@@ -125,24 +125,24 @@ class YunShuoTest {
 		//request1.setId(1656131971312533504L);
 		request1.setName("施工工具");
 		//当前本体属性指向当前本体
-		AttributeEntity attributeEntity1 = new AttributeEntity(null, "施工工具属性1", "String", true, false, 0, 100, 0, "备注");
-		AttributeEntity attributeEntity2 = new AttributeEntity(null, "施工工具属性2", "Integer", false, true, 0, 100, 0, "备注");
-		request1.getAttributeEntityList().add(attributeEntity1);
-		request1.getAttributeEntityList().add(attributeEntity2);
+		AttributeEntity attribute1 = new AttributeEntity(null, "施工工具属性1", "String", true, false, 0, 100, 0, "备注");
+		AttributeEntity attribute2 = new AttributeEntity(null, "施工工具属性2", "Integer", false, true, 0, 100, 0, "备注");
+		request1.getAttributeList().add(attribute1);
+		request1.getAttributeList().add(attribute2);
 
 		BenTiRequest request2 = new BenTiRequest();
 		//request2.setId(1656131971312533507L);
 		request2.setName("接入式电子");
 		//当前本体属性指向当前本体
-		AttributeEntity attributeEntity3 = new AttributeEntity(null, "接入式电子属性1", "String", true, false, 0, 100, 0, "备注");
-		AttributeEntity attributeEntity4 = new AttributeEntity(null, "接入式电子属性2", "Integer", false, true, 0, 100, 0, "备注");
-		request2.getAttributeEntityList().add(attributeEntity3);
-		request2.getAttributeEntityList().add(attributeEntity4);
+		AttributeEntity attribute3 = new AttributeEntity(null, "接入式电子属性1", "String", true, false, 0, 100, 0, "备注");
+		AttributeEntity attribute4 = new AttributeEntity(null, "接入式电子属性2", "Integer", false, true, 0, 100, 0, "备注");
+		request2.getAttributeList().add(attribute3);
+		request2.getAttributeList().add(attribute4);
 		//当前本体指向其他本体
 		BenTiRequest endBenTi1 = new BenTiRequest();
 		endBenTi1.setRelationshipType("施工工具");
 		endBenTi1.setName("施工工具");
-		request2.getEndBenTiEntityList().add(endBenTi1);
+		request2.getEndBenTiList().add(endBenTi1);
 
 		BenTiRequest request3 = new BenTiRequest();
 		//request3.setId(1656131971312533510L);
@@ -151,7 +151,7 @@ class YunShuoTest {
 		BenTiRequest endBenTi2 = new BenTiRequest();
 		endBenTi2.setRelationshipType("分类");
 		endBenTi2.setName("接入式电子");
-		request3.getEndBenTiEntityList().add(endBenTi2);
+		request3.getEndBenTiList().add(endBenTi2);
 
 		return Arrays.asList(request1, request2, request3);
 	}
