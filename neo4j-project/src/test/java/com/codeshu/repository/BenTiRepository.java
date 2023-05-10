@@ -2,7 +2,10 @@ package com.codeshu.repository;
 
 import com.codeshu.entity.BenTiEntity;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
+import org.springframework.data.neo4j.repository.query.Query;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /**
  * @author CodeShu
@@ -11,4 +14,19 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface BenTiRepository extends Neo4jRepository<BenTiEntity, Long> {
 
+	/**
+	 * 批量删除本体节点的所有属性节点
+	 *
+	 * @param ids 本体节点 id 集合
+	 */
+	@Query("MATCH (a:Attribute)-[r]->(b:BenTi) WHERE b.id IN $0 DELETE a,r")
+	void deleteAttribute(List<Long> ids);
+
+	/**
+	 * 批量删除本体节点的所有指出关系
+	 *
+	 * @param ids 本体节点 id 集合
+	 */
+	@Query("MATCH (a:BenTi)-[r]->(b:BenTi) WHERE a.id IN $0 DELETE r")
+	void deleteRelationShip(List<Long> ids);
 }

@@ -5,7 +5,6 @@ import cn.hutool.core.lang.Snowflake;
 import cn.hutool.core.util.IdUtil;
 import com.codeshu.entity.AttributeEntity;
 import com.codeshu.entity.BenTiEntity;
-import com.codeshu.repository.AttributeRepository;
 import com.codeshu.repository.BenTiRepository;
 import com.codeshu.request.BenTiRequest;
 import org.junit.jupiter.api.Test;
@@ -22,8 +21,6 @@ import java.util.stream.Collectors;
 
 @SpringBootTest
 class YunShuoTest {
-	@Autowired
-	private AttributeRepository attributeRepository;
 
 	@Autowired
 	private BenTiRepository benTiRepository;
@@ -39,19 +36,12 @@ class YunShuoTest {
 		//当节点的ID为NULL时则表示新增节点，当节点的ID不为NULL时表示更新；当ID不为NULL但是库中没有此节点，也会自动创建
 		List<BenTiRequest> requestList = getBenTiEntityHasId();
 
-		//查询出库中所有这些本体节点
+		//传入的这些本体节点
 		List<Long> benTiIds = requestList.stream().map(BenTiRequest::getId).filter(Objects::nonNull).collect(Collectors.toList());
-		List<BenTiEntity> dbBenTiEntityList = benTiRepository.findAllById(benTiIds);
-		//获取这些本体节点的所有属性节点
-		List<List<AttributeEntity>> dbAttributeList = dbBenTiEntityList.stream().map(BenTiEntity::getAttributeList)
-				.filter(Objects::nonNull).collect(Collectors.toList());
-		List<Long> allAttributeIds = new ArrayList<>();
-		for (List<AttributeEntity> attributeList : dbAttributeList) {
-			List<Long> attributeIds = attributeList.stream().map(AttributeEntity::getId).filter(Objects::nonNull).collect(Collectors.toList());
-			allAttributeIds.addAll(attributeIds);
-		}
 		//删除这些本体节点的属性节点
-		attributeRepository.deleteAllById(allAttributeIds);
+		benTiRepository.deleteAttribute(benTiIds);
+		//删除这些本体节点的所有射出关系
+		benTiRepository.deleteRelationShip(benTiIds);
 
 		//为本体节点和属性节点生成 id 字段值
 		generateIdToNode(requestList);
@@ -121,17 +111,26 @@ class YunShuoTest {
 	 * @return 参数
 	 */
 	public List<BenTiRequest> getBenTiEntityHasId() {
-		BenTiRequest request1 = new BenTiRequest();
-		//request1.setId(1656131971312533504L);
-		request1.setName("施工工具");
+		BenTiRequest request0 = new BenTiRequest();
+		request0.setName("危险点");
 		//当前本体属性指向当前本体
-		AttributeEntity attribute1 = new AttributeEntity(null, "施工工具属性1", "String", true, false, 0, 100, 0, "备注");
-		AttributeEntity attribute2 = new AttributeEntity(null, "施工工具属性2", "Integer", false, true, 0, 100, 0, "备注");
+		AttributeEntity attribute0 = new AttributeEntity(null, "危险点属性", "String", true, false, 0, 100, 0, "备注");
+		request0.getAttributeList().add(attribute0);
+		//当前本体指向其他本体
+		BenTiRequest endBenTi0 = new BenTiRequest();
+		endBenTi0.setRelationshipType("危险点");
+		endBenTi0.setName("接入式电子");
+		request0.getEndBenTiList().add(endBenTi0);
+
+		BenTiRequest request1 = new BenTiRequest();
+		request1.setId(1656212893378641920L);
+		request1.setName("修改施工工具");
+		//当前本体属性指向当前本体
+		AttributeEntity attribute1 = new AttributeEntity(null, "修改属性", "String", true, false, 0, 100, 0, "备注");
 		request1.getAttributeList().add(attribute1);
-		request1.getAttributeList().add(attribute2);
 
 		BenTiRequest request2 = new BenTiRequest();
-		//request2.setId(1656131971312533507L);
+		request2.setId(1656212893378641923L);
 		request2.setName("接入式电子");
 		//当前本体属性指向当前本体
 		AttributeEntity attribute3 = new AttributeEntity(null, "接入式电子属性1", "String", true, false, 0, 100, 0, "备注");
@@ -141,19 +140,16 @@ class YunShuoTest {
 		//当前本体指向其他本体
 		BenTiRequest endBenTi1 = new BenTiRequest();
 		endBenTi1.setRelationshipType("施工工具");
-		endBenTi1.setName("施工工具");
+		endBenTi1.setName("修改施工工具");
 		request2.getEndBenTiList().add(endBenTi1);
 
 		BenTiRequest request3 = new BenTiRequest();
-		//request3.setId(1656131971312533510L);
+		request3.setId(1656212893378641926L);
 		request3.setName("电子计量装置");
-		//当前本体指向其他本体
-		BenTiRequest endBenTi2 = new BenTiRequest();
-		endBenTi2.setRelationshipType("分类");
-		endBenTi2.setName("接入式电子");
-		request3.getEndBenTiList().add(endBenTi2);
+		AttributeEntity attribute5 = new AttributeEntity(null, "电子计量装置属性1", "Integer", false, true, 0, 100, 0, "备注");
+		request3.getAttributeList().add(attribute5);
 
-		return Arrays.asList(request1, request2, request3);
+		return Arrays.asList(request0,request1, request2, request3);
 	}
 
 	@Test
