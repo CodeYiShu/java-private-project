@@ -17,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 public class BenTiRequest {
 	/**
-	 * 自定义id
+	 * 本体节点id（更新时需携带）
 	 */
 	private Long id;
 
@@ -27,9 +27,19 @@ public class BenTiRequest {
 	private String name;
 
 	/**
-	 * 关系类型
+	 * 本体节点之间的关系类型
 	 */
 	private String relationshipType;
+
+	/**
+	 * 本体节点之间的关系描述
+	 */
+	private String relationShipDescription;
+
+	/**
+	 * 本体节点之间的关系备注
+	 */
+	private String relationShipRemark;
 
 	/**
 	 * 多个属性作为弧尾，指向当前本体
