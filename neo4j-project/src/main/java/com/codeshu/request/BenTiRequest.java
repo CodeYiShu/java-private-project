@@ -16,6 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BenTiRequest {
+
 	/**
 	 * 本体节点id（更新时需携带）
 	 */
@@ -25,6 +26,16 @@ public class BenTiRequest {
 	 * 本体名称
 	 */
 	private String benTiName;
+
+	/**
+	 * 旧模型id
+	 */
+	private Long oldModelId;
+
+	/**
+	 * 模型名称
+	 */
+	private String modelName;
 
 
 	/**

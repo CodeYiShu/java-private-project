@@ -6,7 +6,9 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.json.JSONUtil;
 import com.codeshu.entity.AttributeEntity;
 import com.codeshu.entity.BenTiEntity;
+import com.codeshu.entity.Model;
 import com.codeshu.repository.BenTiRepository;
+import com.codeshu.repository.ModelRepository;
 import com.codeshu.request.BenTiRequest;
 import com.codeshu.response.GetAllResponse;
 import com.codeshu.response.QueryBenTiRelationShipResponse;
@@ -21,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @SpringBootTest
@@ -31,6 +34,9 @@ class YunShuoTest {
 
 	@Resource
 	private Neo4jClient neo4jClient;
+
+	@Autowired
+	private ModelRepository modelRepository;
 
 	/**
 	 * 直接用这个方法来插入和更新即可
@@ -65,6 +71,9 @@ class YunShuoTest {
 		for (String cypher : cypherList) {
 			neo4jClient.query(cypher).run();
 		}
+
+		//让模型节点关联到所有本体节点
+		createModelRelationShip(benTiEntityList, requestList.get(0));
 	}
 
 	/**
@@ -116,12 +125,33 @@ class YunShuoTest {
 		}
 	}
 
+	public void createModelRelationShip(List<BenTiEntity> benTiEntityList, BenTiRequest request) {
+		Long oldModelId = request.getOldModelId();
+
+		Model model = new Model();
+		Snowflake snowflake = IdUtil.getSnowflake();
+		model.setName(request.getModelName());
+		model.setId(snowflake.nextId());
+		model.setBenTiEntityList(benTiEntityList);
+		if (Objects.isNull(oldModelId)) {
+			//没有旧模型id表示是新模型
+			model.setVersion("1.0");
+		} else {
+			//有旧模型id表示是基于旧模型
+			String version = modelRepository.selectVersionById(oldModelId);
+			String newVersion = String.format("%.1f", Double.parseDouble(version) + 1);
+			model.setVersion(newVersion);
+		}
+		modelRepository.save(model);
+	}
+
 	/**
 	 * 模拟入参
 	 *
 	 * @return 参数
 	 */
 	public List<BenTiRequest> getBenTiEntityHasId() {
+
 		BenTiRequest request1 = new BenTiRequest();
 		//request1.setId(1656131971312533504L);
 		request1.setBenTiName("施工工具");
@@ -158,9 +188,15 @@ class YunShuoTest {
 		endBenTi2.setRelationShipRemark("关系备注");
 		request3.getEndBenTiList().add(endBenTi2);
 
+		request1.setOldModelId(1656560389447569408L);
+		request1.setModelName("模型名称3");
+
 		return Arrays.asList(request1, request2, request3);
 	}
 
+	/**
+	 * 查询
+	 */
 	@Test
 	public void testQuery() {
 		List<GetAllResponse> getAllResponseList = new ArrayList<>();
@@ -206,5 +242,12 @@ class YunShuoTest {
 		}
 
 		System.out.println(JSONUtil.parseArray(getAllResponseList));
+	}
+
+	@Test
+	public void testQueryModel() {
+		Optional<Model> modelOptional = modelRepository.findById(1656560922342309888L);
+		Model model = modelOptional.orElse(null);
+		System.out.println(JSONUtil.parseObj(model));
 	}
 }
