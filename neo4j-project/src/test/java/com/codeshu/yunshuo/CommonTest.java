@@ -1,5 +1,7 @@
 package com.codeshu.yunshuo;
 
+import cn.hutool.core.lang.Snowflake;
+import cn.hutool.core.util.IdUtil;
 import com.codeshu.entity.AttributeEntity;
 import com.codeshu.request.BenTiRequest;
 
@@ -59,5 +61,16 @@ public class CommonTest {
 		request1.setProjectId(111111111111111112L);
 
 		return Arrays.asList(request1, request2, request3);
+	}
+
+
+	/**
+	 * 生成雪花算法的Id
+	 *
+	 * @return Id
+	 */
+	public static Long generateId() {
+		Snowflake snowflake = IdUtil.getSnowflake();
+		return snowflake.nextId();
 	}
 }
