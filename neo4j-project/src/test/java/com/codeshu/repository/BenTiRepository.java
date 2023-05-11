@@ -1,7 +1,7 @@
 package com.codeshu.repository;
 
 import com.codeshu.entity.BenTiEntity;
-import com.codeshu.response.QueryResponse;
+import com.codeshu.response.QueryBenTiRelationShipResponse;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.neo4j.repository.query.Query;
 import org.springframework.stereotype.Repository;
@@ -36,7 +36,7 @@ public interface BenTiRepository extends Neo4jRepository<BenTiEntity, Long> {
 	 *
 	 * @return 关系信息
 	 */
-	@Query("MATCH (a:BenTi)-[r]->(b:BenTi) RETURN a,a.id as startId,type(r) as type," +
-			"properties(r).description as description,properties(r).remark as remark,b.id as endId")
-	List<QueryResponse> selectBenTiRelationShip();
+	@Query("MATCH (a:BenTi)-[r]->(b:BenTi) RETURN a,a.id as startId,type(r) as relationshipType," +
+			"properties(r).relationShipDescription as description,properties(r).remark as relationShipRemark,b.id as endId")
+	List<QueryBenTiRelationShipResponse> selectBenTiRelationShip();
 }

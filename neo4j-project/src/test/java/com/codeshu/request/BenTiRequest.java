@@ -37,6 +37,9 @@ public class BenTiRequest {
 	 */
 	private List<BenTiRelationship> endBenTiList = new ArrayList<>();
 
+	/**
+	 * 本体节点之间的关系定义
+	 */
 	@Data
 	public static class BenTiRelationship {
 		/**

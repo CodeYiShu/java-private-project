@@ -8,8 +8,8 @@ import com.codeshu.entity.AttributeEntity;
 import com.codeshu.entity.BenTiEntity;
 import com.codeshu.repository.BenTiRepository;
 import com.codeshu.request.BenTiRequest;
-import com.codeshu.response.GetResponse;
-import com.codeshu.response.QueryResponse;
+import com.codeshu.response.GetAllResponse;
+import com.codeshu.response.QueryBenTiRelationShipResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -163,48 +163,48 @@ class YunShuoTest {
 
 	@Test
 	public void testQuery() {
-		List<GetResponse> getResponseList = new ArrayList<>();
+		List<GetAllResponse> getAllResponseList = new ArrayList<>();
 
 		//查询本体节点之间的关系
-		List<QueryResponse> queryResponseList = benTiRepository.selectBenTiRelationShip();
+		List<QueryBenTiRelationShipResponse> relationShipResponseList = benTiRepository.selectBenTiRelationShip();
 		//查询本体节点的信息（包括其属性节点）
-		List<Long> startBenTiIds = queryResponseList.stream().map(QueryResponse::getStartId).filter(Objects::nonNull)
+		List<Long> startBenTiIds = relationShipResponseList.stream().map(QueryBenTiRelationShipResponse::getStartId).filter(Objects::nonNull)
 				.collect(Collectors.toList());
-		List<Long> endBenTiIds = queryResponseList.stream().map(QueryResponse::getEndId).filter(Objects::nonNull)
+		List<Long> endBenTiIds = relationShipResponseList.stream().map(QueryBenTiRelationShipResponse::getEndId).filter(Objects::nonNull)
 				.collect(Collectors.toList());
 		List<BenTiEntity> benTiEntityList = benTiRepository.findAllById(CollectionUtil.addAll(startBenTiIds, endBenTiIds));
 
 		//根据弧尾节点（起始节点）分组
-		Map<Long, List<QueryResponse>> responseMap = queryResponseList.stream().collect(Collectors.groupingBy(QueryResponse::getStartId));
-		for (Map.Entry<Long, List<QueryResponse>> entry : responseMap.entrySet()) {
+		Map<Long, List<QueryBenTiRelationShipResponse>> responseMap = relationShipResponseList.stream().collect(Collectors.groupingBy(QueryBenTiRelationShipResponse::getStartId));
+		for (Map.Entry<Long, List<QueryBenTiRelationShipResponse>> entry : responseMap.entrySet()) {
 			Long startId = entry.getKey();
-			List<QueryResponse> queryResponses = entry.getValue();
+			List<QueryBenTiRelationShipResponse> relationShipResponses = entry.getValue();
 
-			GetResponse getResponse = new GetResponse();
-			getResponse.setBenTiId(startId);
+			GetAllResponse getAllResponse = new GetAllResponse();
+			getAllResponse.setBenTiId(startId);
 			//弧尾节点的信息
 			BenTiEntity startBenTiEntity = benTiEntityList.stream().filter(entity -> entity.getId().equals(startId))
 					.findFirst().orElse(null);
 			assert startBenTiEntity != null;
-			getResponse.setBenTiName(startBenTiEntity.getName());
-			getResponse.setAttributeList(startBenTiEntity.getAttributeList());
+			getAllResponse.setBenTiName(startBenTiEntity.getName());
+			getAllResponse.setAttributeList(startBenTiEntity.getAttributeList());
 
-			for (QueryResponse queryResponse : queryResponses) {
-				GetResponse.BenTiRelationship relationship = new GetResponse.BenTiRelationship();
+			for (QueryBenTiRelationShipResponse relationShipResponse : relationShipResponses) {
+				GetAllResponse.BenTiRelationship relationship = new GetAllResponse.BenTiRelationship();
 				//弧头节点的信息
-				BenTiEntity endEntity = benTiEntityList.stream().filter(entity -> entity.getId().equals(queryResponse.getEndId()))
+				BenTiEntity endEntity = benTiEntityList.stream().filter(entity -> entity.getId().equals(relationShipResponse.getEndId()))
 						.findFirst().orElse(null);
 
-				relationship.setEndBenTiId(queryResponse.getEndId());
+				relationship.setEndBenTiId(relationShipResponse.getEndId());
 				relationship.setEndBenTiName(Objects.nonNull(endEntity) ? endEntity.getName() : null);
-				relationship.setRelationshipType(queryResponse.getType());
-				relationship.setRelationShipDescription(queryResponse.getDescription());
-				relationship.setRelationShipRemark(queryResponse.getRemark());
-				getResponse.getEndBenTiList().add(relationship);
+				relationship.setRelationshipType(relationShipResponse.getRelationshipType());
+				relationship.setRelationShipDescription(relationShipResponse.getRelationShipDescription());
+				relationship.setRelationShipRemark(relationShipResponse.getRelationShipRemark());
+				getAllResponse.getEndBenTiList().add(relationship);
 			}
-			getResponseList.add(getResponse);
+			getAllResponseList.add(getAllResponse);
 		}
 
-		System.out.println(JSONUtil.parseArray(getResponseList));
+		System.out.println(JSONUtil.parseArray(getAllResponseList));
 	}
 }
