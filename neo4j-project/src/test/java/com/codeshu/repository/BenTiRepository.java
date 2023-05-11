@@ -1,6 +1,7 @@
 package com.codeshu.repository;
 
 import com.codeshu.entity.BenTiEntity;
+import com.codeshu.response.QueryResponse;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.neo4j.repository.query.Query;
 import org.springframework.stereotype.Repository;
@@ -29,4 +30,13 @@ public interface BenTiRepository extends Neo4jRepository<BenTiEntity, Long> {
 	 */
 	@Query("MATCH (a:BenTi)-[r]->(b:BenTi) WHERE a.id IN $0 DELETE r")
 	void deleteRelationShip(List<Long> ids);
+
+	/**
+	 * 查询本体节点之间的关系
+	 *
+	 * @return 关系信息
+	 */
+	@Query("MATCH (a:BenTi)-[r]->(b:BenTi) RETURN a,a.id as startId,type(r) as type," +
+			"properties(r).description as description,properties(r).remark as remark,b.id as endId")
+	List<QueryResponse> selectBenTiRelationShip();
 }

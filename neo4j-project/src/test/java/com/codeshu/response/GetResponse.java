@@ -1,40 +1,23 @@
-package com.codeshu.request;
+package com.codeshu.response;
 
 import com.codeshu.entity.AttributeEntity;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author CodeShu
- * @date 2023/5/9 15:14
+ * @date 2023/5/11 11:45
  */
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class BenTiRequest {
-	/**
-	 * 本体节点id（更新时需携带）
-	 */
+public class GetResponse {
 	private Long benTiId;
 
-	/**
-	 * 本体名称
-	 */
 	private String benTiName;
 
-
-	/**
-	 * 多个属性作为弧尾，指向当前本体
-	 */
 	private List<AttributeEntity> attributeList = new ArrayList<>();
 
-	/**
-	 * 当前节点作为弧尾，指向其他本体节点
-	 */
 	private List<BenTiRelationship> endBenTiList = new ArrayList<>();
 
 	@Data

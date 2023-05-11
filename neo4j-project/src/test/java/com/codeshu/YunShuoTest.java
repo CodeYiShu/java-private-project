@@ -1,12 +1,15 @@
 package com.codeshu;
 
-import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Snowflake;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.json.JSONUtil;
 import com.codeshu.entity.AttributeEntity;
 import com.codeshu.entity.BenTiEntity;
 import com.codeshu.repository.BenTiRepository;
 import com.codeshu.request.BenTiRequest;
+import com.codeshu.response.GetResponse;
+import com.codeshu.response.QueryResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,6 +19,7 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -37,7 +41,7 @@ class YunShuoTest {
 		List<BenTiRequest> requestList = getBenTiEntityHasId();
 
 		//传入的这些本体节点
-		List<Long> benTiIds = requestList.stream().map(BenTiRequest::getId).filter(Objects::nonNull).collect(Collectors.toList());
+		List<Long> benTiIds = requestList.stream().map(BenTiRequest::getBenTiId).filter(Objects::nonNull).collect(Collectors.toList());
 		//删除这些本体节点的属性节点
 		benTiRepository.deleteAttribute(benTiIds);
 		//删除这些本体节点的所有射出关系
@@ -46,7 +50,14 @@ class YunShuoTest {
 		//为本体节点和属性节点生成 id 字段值
 		generateIdToNode(requestList);
 		//再去保存这些本体节点和她的属性节点
-		List<BenTiEntity> benTiEntityList = BeanUtil.copyToList(requestList, BenTiEntity.class);
+		List<BenTiEntity> benTiEntityList = new ArrayList<>();
+		for (BenTiRequest request : requestList) {
+			BenTiEntity benTiEntity = new BenTiEntity();
+			benTiEntity.setId(request.getBenTiId());
+			benTiEntity.setName(request.getBenTiName());
+			benTiEntity.setAttributeList(request.getAttributeList());
+			benTiEntityList.add(benTiEntity);
+		}
 		benTiRepository.saveAll(benTiEntityList);
 
 		//本体节点之间的关系
@@ -72,12 +83,12 @@ class YunShuoTest {
 			List<BenTiRequest.BenTiRelationship> endBenTiRequestList = request.getEndBenTiList();
 			for (BenTiRequest.BenTiRelationship endBenTiRequest : endBenTiRequestList) {
 				//根据节点名称，将 id 字段值设置进弧头本体节点的 id 字段中
-				Long id = requestList.stream().filter(entity -> entity.getName().equals(endBenTiRequest.getName()))
-						.map(BenTiRequest::getId).filter(Objects::nonNull).findFirst().orElse(null);
-				endBenTiRequest.setId(id);
+				Long id = requestList.stream().filter(entity -> entity.getBenTiName().equals(endBenTiRequest.getEndBenTiName()))
+						.map(BenTiRequest::getBenTiId).filter(Objects::nonNull).findFirst().orElse(null);
+				endBenTiRequest.setEndBenTiId(id);
 
 				//参数填充入cypher中
-				String format = String.format(str, request.getId(), endBenTiRequest.getId(), endBenTiRequest.getRelationshipType(), endBenTiRequest.getRelationShipDescription(), endBenTiRequest.getRelationShipRemark());
+				String format = String.format(str, request.getBenTiId(), endBenTiRequest.getEndBenTiId(), endBenTiRequest.getRelationshipType(), endBenTiRequest.getRelationShipDescription(), endBenTiRequest.getRelationShipRemark());
 				cypherList.add(format);
 			}
 		}
@@ -94,8 +105,8 @@ class YunShuoTest {
 
 		for (BenTiRequest request : requestList) {
 			//为没有 id 的本体节点添加上 id
-			if (Objects.isNull(request.getId())) {
-				request.setId(snowflake.nextId());
+			if (Objects.isNull(request.getBenTiId())) {
+				request.setBenTiId(snowflake.nextId());
 			}
 			List<AttributeEntity> attributeEntityList = request.getAttributeList();
 			//为所有属性节点添加上 id
@@ -113,7 +124,7 @@ class YunShuoTest {
 	public List<BenTiRequest> getBenTiEntityHasId() {
 		BenTiRequest request1 = new BenTiRequest();
 		//request1.setId(1656131971312533504L);
-		request1.setName("施工工具");
+		request1.setBenTiName("施工工具");
 		//当前本体属性指向当前本体
 		AttributeEntity attribute1 = new AttributeEntity(null, "施工工具属性1", "String", true, false, 0, 100, 0, "备注");
 		AttributeEntity attribute2 = new AttributeEntity(null, "施工工具属性2", "Integer", false, true, 0, 100, 0, "备注");
@@ -122,7 +133,7 @@ class YunShuoTest {
 
 		BenTiRequest request2 = new BenTiRequest();
 		//request2.setId(1656131971312533507L);
-		request2.setName("接入式电子");
+		request2.setBenTiName("接入式电子");
 		//当前本体属性指向当前本体
 		AttributeEntity attribute3 = new AttributeEntity(null, "接入式电子属性1", "String", true, false, 0, 100, 0, "备注");
 		AttributeEntity attribute4 = new AttributeEntity(null, "接入式电子属性2", "Integer", false, true, 0, 100, 0, "备注");
@@ -133,16 +144,16 @@ class YunShuoTest {
 		endBenTi1.setRelationshipType("施工工具");
 		endBenTi1.setRelationShipDescription("关系描述");
 		endBenTi1.setRelationShipRemark("关系备注");
-		endBenTi1.setName("施工工具");
+		endBenTi1.setEndBenTiName("施工工具");
 		request2.getEndBenTiList().add(endBenTi1);
 
 		BenTiRequest request3 = new BenTiRequest();
 		//request3.setId(1656131971312533510L);
-		request3.setName("电子计量装置");
+		request3.setBenTiName("电子计量装置");
 		//当前本体指向其他本体
 		BenTiRequest.BenTiRelationship endBenTi2 = new BenTiRequest.BenTiRelationship();
 		endBenTi2.setRelationshipType("分类");
-		endBenTi2.setName("接入式电子");
+		endBenTi2.setEndBenTiName("接入式电子");
 		endBenTi2.setRelationShipDescription("关系描述");
 		endBenTi2.setRelationShipRemark("关系备注");
 		request3.getEndBenTiList().add(endBenTi2);
@@ -152,9 +163,48 @@ class YunShuoTest {
 
 	@Test
 	public void testQuery() {
-		List<BenTiEntity> benTiEntityList = benTiRepository.findAll();
-		for (BenTiEntity benTiEntity : benTiEntityList) {
-			System.out.println(benTiEntity);
+		List<GetResponse> getResponseList = new ArrayList<>();
+
+		//查询本体节点之间的关系
+		List<QueryResponse> queryResponseList = benTiRepository.selectBenTiRelationShip();
+		//查询本体节点的信息（包括其属性节点）
+		List<Long> startBenTiIds = queryResponseList.stream().map(QueryResponse::getStartId).filter(Objects::nonNull)
+				.collect(Collectors.toList());
+		List<Long> endBenTiIds = queryResponseList.stream().map(QueryResponse::getEndId).filter(Objects::nonNull)
+				.collect(Collectors.toList());
+		List<BenTiEntity> benTiEntityList = benTiRepository.findAllById(CollectionUtil.addAll(startBenTiIds, endBenTiIds));
+
+		//根据弧尾节点（起始节点）分组
+		Map<Long, List<QueryResponse>> responseMap = queryResponseList.stream().collect(Collectors.groupingBy(QueryResponse::getStartId));
+		for (Map.Entry<Long, List<QueryResponse>> entry : responseMap.entrySet()) {
+			Long startId = entry.getKey();
+			List<QueryResponse> queryResponses = entry.getValue();
+
+			GetResponse getResponse = new GetResponse();
+			getResponse.setBenTiId(startId);
+			//弧尾节点的信息
+			BenTiEntity startBenTiEntity = benTiEntityList.stream().filter(entity -> entity.getId().equals(startId))
+					.findFirst().orElse(null);
+			assert startBenTiEntity != null;
+			getResponse.setBenTiName(startBenTiEntity.getName());
+			getResponse.setAttributeList(startBenTiEntity.getAttributeList());
+
+			for (QueryResponse queryResponse : queryResponses) {
+				GetResponse.BenTiRelationship relationship = new GetResponse.BenTiRelationship();
+				//弧头节点的信息
+				BenTiEntity endEntity = benTiEntityList.stream().filter(entity -> entity.getId().equals(queryResponse.getEndId()))
+						.findFirst().orElse(null);
+
+				relationship.setEndBenTiId(queryResponse.getEndId());
+				relationship.setEndBenTiName(Objects.nonNull(endEntity) ? endEntity.getName() : null);
+				relationship.setRelationshipType(queryResponse.getType());
+				relationship.setRelationShipDescription(queryResponse.getDescription());
+				relationship.setRelationShipRemark(queryResponse.getRemark());
+				getResponse.getEndBenTiList().add(relationship);
+			}
+			getResponseList.add(getResponse);
 		}
+
+		System.out.println(JSONUtil.parseArray(getResponseList));
 	}
 }
