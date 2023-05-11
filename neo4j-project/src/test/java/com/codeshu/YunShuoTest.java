@@ -1,8 +1,10 @@
 package com.codeshu;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Snowflake;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.codeshu.entity.AttributeEntity;
 import com.codeshu.entity.BenTiEntity;
@@ -20,6 +22,7 @@ import org.springframework.data.neo4j.core.Neo4jClient;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -126,20 +129,23 @@ class YunShuoTest {
 	}
 
 	public void createModelRelationShip(List<BenTiEntity> benTiEntityList, BenTiRequest request) {
-		Long oldModelId = request.getOldModelId();
-
 		Model model = new Model();
 		Snowflake snowflake = IdUtil.getSnowflake();
-		model.setName(request.getModelName());
 		model.setId(snowflake.nextId());
+		model.setName(request.getModelName());
+		model.setRemark(request.getModelRemark());
 		model.setBenTiEntityList(benTiEntityList);
-		if (Objects.isNull(oldModelId)) {
-			//没有旧模型id表示是新模型
+		model.setProjectId(request.getProjectId());
+		model.setCreateDate(DateUtil.format(new Date(), "yyyy-MM-dd HH:mm:ss"));
+
+		//项目下所有模型中，最新模型的版本
+		String lastVersion = modelRepository.selectLastVersionByProjectId(request.getProjectId());
+		if (StrUtil.isBlank(lastVersion)) {
+			//如果没有则说明此模型是项目的第一个模型
 			model.setVersion("1.0");
 		} else {
-			//有旧模型id表示是基于旧模型
-			String version = modelRepository.selectVersionById(oldModelId);
-			String newVersion = String.format("%.1f", Double.parseDouble(version) + 1);
+			//版本号加1
+			String newVersion = String.format("%.1f", Double.parseDouble(lastVersion) + 1);
 			model.setVersion(newVersion);
 		}
 		modelRepository.save(model);
@@ -188,8 +194,9 @@ class YunShuoTest {
 		endBenTi2.setRelationShipRemark("关系备注");
 		request3.getEndBenTiList().add(endBenTi2);
 
-		request1.setOldModelId(1656560389447569408L);
-		request1.setModelName("模型名称3");
+		request1.setModelName("模型名称1");
+		request1.setModelRemark("模型备注1");
+		request1.setProjectId(111111111111111112L);
 
 		return Arrays.asList(request1, request2, request3);
 	}

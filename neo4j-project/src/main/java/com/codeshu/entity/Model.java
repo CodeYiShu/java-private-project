@@ -26,8 +26,17 @@ public class Model {
 	@Property("name")
 	private String name;
 
+	@Property("remark")
+	private String remark;
+
 	@Property("version")
 	private String version;
+
+	@Property("projectId")
+	private Long projectId;
+
+	@Property("createDate")
+	private String createDate;
 
 	/**
 	 * 模型节点指向多个本体节点

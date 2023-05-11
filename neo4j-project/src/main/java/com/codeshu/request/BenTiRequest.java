@@ -28,14 +28,19 @@ public class BenTiRequest {
 	private String benTiName;
 
 	/**
-	 * 旧模型id
-	 */
-	private Long oldModelId;
-
-	/**
 	 * 模型名称
 	 */
 	private String modelName;
+
+	/**
+	 * 模型备注
+	 */
+	private String modelRemark;
+
+	/**
+	 * 模型所属项目Id
+	 */
+	private Long projectId;
 
 
 	/**
