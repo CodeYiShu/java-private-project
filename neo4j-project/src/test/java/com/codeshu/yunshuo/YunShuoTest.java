@@ -158,53 +158,48 @@ class YunShuoTest {
 	public void testQuery() {
 		List<GetAllResponse> getAllResponseList = new ArrayList<>();
 
-		//查询本体节点之间的关系
-		List<QueryBenTiRelationShipResponse> relationShipResponseList = benTiRepository.selectBenTiRelationShip();
-		//查询本体节点的信息（包括其属性节点）
-		List<Long> startBenTiIds = relationShipResponseList.stream().map(QueryBenTiRelationShipResponse::getStartId).filter(Objects::nonNull)
-				.collect(Collectors.toList());
-		List<Long> endBenTiIds = relationShipResponseList.stream().map(QueryBenTiRelationShipResponse::getEndId).filter(Objects::nonNull)
-				.collect(Collectors.toList());
-		List<BenTiEntity> benTiEntityList = benTiRepository.findAllById(CollectionUtil.addAll(startBenTiIds, endBenTiIds));
-
-		//根据弧尾节点（起始节点）分组
-		Map<Long, List<QueryBenTiRelationShipResponse>> responseMap = relationShipResponseList.stream().collect(Collectors.groupingBy(QueryBenTiRelationShipResponse::getStartId));
-		for (Map.Entry<Long, List<QueryBenTiRelationShipResponse>> entry : responseMap.entrySet()) {
-			Long startId = entry.getKey();
-			List<QueryBenTiRelationShipResponse> relationShipResponses = entry.getValue();
-
-			GetAllResponse getAllResponse = new GetAllResponse();
-			getAllResponse.setBenTiId(startId);
-			//弧尾节点的信息
-			BenTiEntity startBenTiEntity = benTiEntityList.stream().filter(entity -> entity.getId().equals(startId))
-					.findFirst().orElse(null);
-			assert startBenTiEntity != null;
-			getAllResponse.setBenTiName(startBenTiEntity.getName());
-			getAllResponse.setAttributeList(startBenTiEntity.getAttributeList());
-
-			for (QueryBenTiRelationShipResponse relationShipResponse : relationShipResponses) {
-				GetAllResponse.BenTiRelationship relationship = new GetAllResponse.BenTiRelationship();
-				//弧头节点的信息
-				BenTiEntity endEntity = benTiEntityList.stream().filter(entity -> entity.getId().equals(relationShipResponse.getEndId()))
-						.findFirst().orElse(null);
-
-				relationship.setEndBenTiId(relationShipResponse.getEndId());
-				relationship.setEndBenTiName(Objects.nonNull(endEntity) ? endEntity.getName() : null);
-				relationship.setRelationshipType(relationShipResponse.getRelationshipType());
-				relationship.setRelationShipDescription(relationShipResponse.getRelationShipDescription());
-				relationship.setRelationShipRemark(relationShipResponse.getRelationShipRemark());
-				getAllResponse.getEndBenTiList().add(relationship);
-			}
-			getAllResponseList.add(getAllResponse);
-		}
-
-		System.out.println(JSONUtil.parseArray(getAllResponseList));
-	}
-
-	@Test
-	public void testQueryModel() {
-		Optional<Model> modelOptional = modelRepository.findById(1656560922342309888L);
+		//查询模型下的所有本体（包含其属性）
+		Optional<Model> modelOptional = modelRepository.findById(1656578388736954368L);
 		Model model = modelOptional.orElse(null);
-		System.out.println(JSONUtil.parseObj(model));
+		if (Objects.nonNull(model)) {
+			List<BenTiEntity> benTiEntityList = model.getBenTiEntityList();
+			List<Long> benTiIds = benTiEntityList.stream().map(BenTiEntity::getId).filter(Objects::nonNull).collect(Collectors.toList());
+
+			//查询本体节点之间的关系
+			List<QueryBenTiRelationShipResponse> relationShipResponseList = benTiRepository.selectBenTiRelationShip(benTiIds);
+
+			//根据弧尾节点（起始节点）分组
+			Map<Long, List<QueryBenTiRelationShipResponse>> responseMap = relationShipResponseList.stream().collect(Collectors.groupingBy(QueryBenTiRelationShipResponse::getStartId));
+			for (Map.Entry<Long, List<QueryBenTiRelationShipResponse>> entry : responseMap.entrySet()) {
+				Long startId = entry.getKey();
+				List<QueryBenTiRelationShipResponse> relationShipResponses = entry.getValue();
+
+				GetAllResponse getAllResponse = new GetAllResponse();
+				getAllResponse.setBenTiId(startId);
+				//弧尾节点的信息
+				BenTiEntity startBenTiEntity = benTiEntityList.stream().filter(entity -> entity.getId().equals(startId))
+						.findFirst().orElse(null);
+				assert startBenTiEntity != null;
+				getAllResponse.setBenTiName(startBenTiEntity.getName());
+				getAllResponse.setAttributeList(startBenTiEntity.getAttributeList());
+
+				for (QueryBenTiRelationShipResponse relationShipResponse : relationShipResponses) {
+					GetAllResponse.BenTiRelationship relationship = new GetAllResponse.BenTiRelationship();
+					//弧头节点的信息
+					BenTiEntity endEntity = benTiEntityList.stream().filter(entity -> entity.getId().equals(relationShipResponse.getEndId()))
+							.findFirst().orElse(null);
+
+					relationship.setEndBenTiId(relationShipResponse.getEndId());
+					relationship.setEndBenTiName(Objects.nonNull(endEntity) ? endEntity.getName() : null);
+					relationship.setRelationshipType(relationShipResponse.getRelationshipType());
+					relationship.setRelationShipDescription(relationShipResponse.getRelationShipDescription());
+					relationship.setRelationShipRemark(relationShipResponse.getRelationShipRemark());
+					getAllResponse.getEndBenTiList().add(relationship);
+				}
+				getAllResponseList.add(getAllResponse);
+			}
+
+			System.out.println(JSONUtil.parseArray(getAllResponseList));
+		}
 	}
 }

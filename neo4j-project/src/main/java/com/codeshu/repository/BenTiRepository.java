@@ -32,11 +32,12 @@ public interface BenTiRepository extends Neo4jRepository<BenTiEntity, Long> {
 	void deleteRelationShip(List<Long> ids);
 
 	/**
-	 * 查询本体节点之间的关系
+	 * 查询指定本体节点之间的关系
 	 *
+	 * @param ids 指定本体节点
 	 * @return 关系信息
 	 */
-	@Query("MATCH (a:BenTi)-[r]->(b:BenTi) RETURN a,a.id as startId,type(r) as relationshipType," +
+	@Query("MATCH (a:BenTi)-[r]->(b:BenTi) WHERE a.id IN $0 AND b.id IN $0 RETURN a,a.id as startId,type(r) as relationshipType," +
 			"properties(r).relationShipDescription as description,properties(r).remark as relationShipRemark,b.id as endId")
-	List<QueryBenTiRelationShipResponse> selectBenTiRelationShip();
+	List<QueryBenTiRelationShipResponse> selectBenTiRelationShip(List<Long> ids);
 }
