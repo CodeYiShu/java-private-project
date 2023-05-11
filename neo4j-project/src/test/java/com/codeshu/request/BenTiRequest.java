@@ -26,20 +26,6 @@ public class BenTiRequest {
 	 */
 	private String name;
 
-	/**
-	 * 本体节点之间的关系类型
-	 */
-	private String relationshipType;
-
-	/**
-	 * 本体节点之间的关系描述
-	 */
-	private String relationShipDescription;
-
-	/**
-	 * 本体节点之间的关系备注
-	 */
-	private String relationShipRemark;
 
 	/**
 	 * 多个属性作为弧尾，指向当前本体
@@ -49,5 +35,33 @@ public class BenTiRequest {
 	/**
 	 * 当前节点作为弧尾，指向其他本体节点
 	 */
-	private List<BenTiRequest> endBenTiList = new ArrayList<>();
+	private List<BenTiRelationship> endBenTiList = new ArrayList<>();
+
+	@Data
+	public static class BenTiRelationship {
+		/**
+		 * 本体节点id
+		 */
+		private Long id;
+
+		/**
+		 * 本体节点名字
+		 */
+		private String name;
+
+		/**
+		 * 本体节点之间的关系类型
+		 */
+		private String relationshipType;
+
+		/**
+		 * 本体节点之间的关系描述
+		 */
+		private String relationShipDescription;
+
+		/**
+		 * 本体节点之间的关系备注
+		 */
+		private String relationShipRemark;
+	}
 }

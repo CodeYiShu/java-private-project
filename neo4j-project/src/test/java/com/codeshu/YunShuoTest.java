@@ -69,8 +69,8 @@ class YunShuoTest {
 
 		for (BenTiRequest request : requestList) {
 			//获取当前本体节点的所有弧头本体节点
-			List<BenTiRequest> endBenTiRequestList = request.getEndBenTiList();
-			for (BenTiRequest endBenTiRequest : endBenTiRequestList) {
+			List<BenTiRequest.BenTiRelationship> endBenTiRequestList = request.getEndBenTiList();
+			for (BenTiRequest.BenTiRelationship endBenTiRequest : endBenTiRequestList) {
 				//根据节点名称，将 id 字段值设置进弧头本体节点的 id 字段中
 				Long id = requestList.stream().filter(entity -> entity.getName().equals(endBenTiRequest.getName()))
 						.map(BenTiRequest::getId).filter(Objects::nonNull).findFirst().orElse(null);
@@ -129,7 +129,7 @@ class YunShuoTest {
 		request2.getAttributeList().add(attribute3);
 		request2.getAttributeList().add(attribute4);
 		//当前本体指向其他本体
-		BenTiRequest endBenTi1 = new BenTiRequest();
+		BenTiRequest.BenTiRelationship endBenTi1 = new BenTiRequest.BenTiRelationship();
 		endBenTi1.setRelationshipType("施工工具");
 		endBenTi1.setRelationShipDescription("关系描述");
 		endBenTi1.setRelationShipRemark("关系备注");
@@ -140,7 +140,7 @@ class YunShuoTest {
 		//request3.setId(1656131971312533510L);
 		request3.setName("电子计量装置");
 		//当前本体指向其他本体
-		BenTiRequest endBenTi2 = new BenTiRequest();
+		BenTiRequest.BenTiRelationship endBenTi2 = new BenTiRequest.BenTiRelationship();
 		endBenTi2.setRelationshipType("分类");
 		endBenTi2.setName("接入式电子");
 		endBenTi2.setRelationShipDescription("关系描述");
