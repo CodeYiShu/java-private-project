@@ -38,6 +38,6 @@ public interface BenTiRepository extends Neo4jRepository<BenTiEntity, Long> {
 	 * @return 关系信息
 	 */
 	@Query("MATCH (a:BenTi)-[r]->(b:BenTi) WHERE a.id IN $0 AND b.id IN $0 RETURN a,a.id as startId,type(r) as relationshipType," +
-			"properties(r).relationShipDescription as description,properties(r).remark as relationShipRemark,b.id as endId")
+			"properties(r).relationShipDescription as relationShipDescription,properties(r).relationShipRemark as relationShipRemark,b.id as endId")
 	List<QueryBenTiRelationShipResponse> selectBenTiRelationShip(List<Long> ids);
 }
