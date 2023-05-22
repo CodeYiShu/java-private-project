@@ -1,4 +1,4 @@
 # Project exclude paths
 /JavaBaseUtils/target/
 /.idea/
-/JavaBaseUtils/src/main/java/com/codeshu/sign/
+/java-base-utils-project/src/main/java/com/codeshu/sign/
