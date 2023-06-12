@@ -1,6 +1,7 @@
 package com.codeshu.transational.controller;
 
 import com.codeshu.transational.service.AService;
+import com.codeshu.transational.service.TestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,8 +16,16 @@ public class TestController {
 	@Autowired
 	private AService aService;
 
+	@Autowired
+	private TestService testService;
+
 	@GetMapping("test")
 	public void test() {
 		aService.aMethod();
+	}
+
+	@GetMapping("testTransactionFault")
+	public void testTransactionFault(){
+		testService.method();
 	}
 }
