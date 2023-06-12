@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.codeshu.transational.mapper.AccountMapper">
+    <select id="findAll" resultType="com.codeshu.transational.entity.AccountEntity">
+        SELECT * FROM account;
+    </select>
+
+    <update id="update" parameterType="com.codeshu.transational.entity.AccountEntity">
+        UPDATE account set money = #{money}
+        WHERE id = #{id}
+    </update>
+</mapper>
