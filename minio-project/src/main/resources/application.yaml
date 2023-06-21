@@ -1,0 +1,15 @@
+minio:
+  # Minio 服务地址
+  endpoint: http://175.178.113.82
+  # Minio API 端口
+  port: 9001
+  # 秘钥
+  accessKey: C969Z965HPCGQFX7HPP2
+  secretKey: DqhxDLsMnHeUyOmzCqD74vRg28yBo5LbI+XqBYxB
+  secure: false
+  # 桶名 这给出了一个默认桶名
+  bucket-name: test
+  # 图片文件的最大大小
+  image-size: 10485760
+  # 文件的最大大小
+  file-size: 1073741824
