@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author CodeShu
@@ -27,8 +28,8 @@ public class LotteryServiceImpl implements LotteryService {
 
 		for (int i = 0; i < count; i++) {
 			DaLeTouResponse response = new DaLeTouResponse();
-			Set<String> before = daLeTouBefore(1, 35);
-			Set<String> after = daLeTouAfter(1, 12);
+			Set<String> before = daLeTouBefore(1, 35).stream().sorted().collect(Collectors.toCollection(LinkedHashSet::new));
+			Set<String> after = daLeTouAfter(1, 12).stream().sorted().collect(Collectors.toCollection(LinkedHashSet::new));
 			response.setBefore(before);
 			response.setAfter(after);
 			responseList.add(response);
@@ -81,8 +82,8 @@ public class LotteryServiceImpl implements LotteryService {
 		List<ShuangSeQiuResponse> responseList = new ArrayList<>();
 		for (int i = 0; i < count; i++) {
 			ShuangSeQiuResponse response = new ShuangSeQiuResponse();
-			Set<String> red = red(1, 33);
-			Set<String> blue = blue(1, 16);
+			Set<String> red = red(1, 33).stream().sorted().collect(Collectors.toCollection(LinkedHashSet::new));
+			Set<String> blue = blue(1, 16).stream().sorted().collect(Collectors.toCollection(LinkedHashSet::new));
 			response.setRed(red);
 			response.setBlue(blue);
 			responseList.add(response);
