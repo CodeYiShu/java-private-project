@@ -12,6 +12,7 @@
     <module>java-base-utils-project</module>
       <module>interview-project</module>
     <module>interview-project/java-base-module</module>
+      <module>interview-project/spring-base-module</module>
   </modules>
 
   <name>java-private-project</name>
