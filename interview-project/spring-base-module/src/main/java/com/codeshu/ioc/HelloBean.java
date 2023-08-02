@@ -1,5 +1,7 @@
 package com.codeshu.ioc;
 
+import org.springframework.stereotype.Component;
+
 /**
  * @author CodeShu
  * @date 2023/7/19 10:28
