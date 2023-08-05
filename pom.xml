@@ -13,6 +13,8 @@
       <module>interview-project</module>
     <module>interview-project/java-base-module</module>
       <module>interview-project/spring-base-module</module>
+      <module>servlet-project</module>
+      <module>servlet-project</module>
   </modules>
 
   <name>java-private-project</name>
