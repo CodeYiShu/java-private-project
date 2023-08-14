@@ -12,9 +12,17 @@
     </resultMap>
 
     <select id="getUserInfo" resultMap="getUserInfoMap">
-        SELECT T1.id,T1.username,T2.project_id
+        SELECT T1.id, T1.username, T2.project_id
         FROM sys_user AS T1
-        LEFT JOIN user_project AS T2 ON T1.id = T2.user_id
+                 LEFT JOIN user_project AS T2 ON T1.id = T2.user_id
         WHERE T1.id = #{id}
     </select>
+
+    <insert id="insertBatch" parameterType="com.codeshu.entity.SysUserEntity">
+        INSERT INTO sys_user(username)
+        VALUES
+        <foreach collection="userEntityList" item="userEntity" separator=",">
+            (#{userEntity.username})
+        </foreach>
+    </insert>
 </mapper>

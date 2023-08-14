@@ -1,7 +1,10 @@
 package com.codeshu.mapper;
 
+import com.codeshu.entity.SysUserEntity;
 import com.codeshu.response.GetUserInfoResponse;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * @author CodeShu
@@ -9,4 +12,9 @@ import org.apache.ibatis.annotations.Param;
  */
 public interface SysUserMapper {
 	GetUserInfoResponse getUserInfo(@Param("id") Long id);
+
+	/**
+	 * 批量插入
+	 */
+	void insertBatch(@Param("userEntityList") List<SysUserEntity> userEntityList);
 }
