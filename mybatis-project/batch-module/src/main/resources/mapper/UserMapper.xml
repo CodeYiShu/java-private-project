@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.codeshu.mapper.UserMapper">
+
+    <insert id="insertBatch" parameterType="com.codeshu.entity.UserEntity">
+        INSERT INTO mybatis_batch_user(username)
+        VALUES
+        <foreach collection="userEntityList" item="userEntity" separator=",">
+            (#{userEntity.username})
+        </foreach>
+    </insert>
+</mapper>
