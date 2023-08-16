@@ -14,7 +14,7 @@
     <select id="getUserInfo" resultMap="getUserInfoMap">
         SELECT T1.id, T1.username, T2.project_id
         FROM mybatis_aspect_user AS T1
-                 LEFT JOIN user_project AS T2 ON T1.id = T2.user_id
+                 LEFT JOIN mybatis_aspect_user_project AS T2 ON T1.id = T2.user_id
         WHERE T1.id = #{id}
     </select>
 </mapper>
