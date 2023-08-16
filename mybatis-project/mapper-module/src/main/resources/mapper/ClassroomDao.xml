@@ -1,6 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.codeshu.dao.ClassroomDao">
+    <!-- 一对多（简单类型） -->
+    <resultMap id="getByIdSimpleTypeMap" type="com.codeshu.response.ClassroomGetByIdSimpleTypeResponse">
+        <id property="id" column="id"/>
+        <result property="className" column="class_name"/>
+        <!-- 简单类型 String -->
+        <collection property="studentNameList" ofType="java.lang.String">
+            <result column="studentName"/>
+        </collection>
+    </resultMap>
 
+    <select id="getByIdSimpleType" resultMap="getByIdSimpleTypeMap">
+        SELECT T1.id, T1.class_name, T3.student_name studentName
+        FROM mybatis_mapper_classroom T1
+                 LEFT JOIN mybatis_mapper_classroom_student T2 ON T1.id = T2.class_id
+                 LEFT JOIN mybatis_mapper_student T3 ON T2.student_id = T3.id
+        WHERE T1.id = #{id}
+    </select>
+
+
+    <!-- 一对多（对象类型）：映射外层对象 -->
+    <resultMap id="getByIdObjectTypeResponseMap" type="com.codeshu.response.ClassroomGetByIdObjectTypeResponse">
+        <id property="id" column="id"/>
+        <result property="className" column="class_name"/>
+        <association property="studentList" resultMap="getByIdObjectTypeStudentMap"/>
+    </resultMap>
+
+    <!-- 一对多（对象类型）：映射 List 内部的对象 -->
+    <resultMap id="getByIdObjectTypeStudentMap" type="com.codeshu.entity.Student">
+        <id property="id" column="studentId"/>
+        <result property="studentName" column="studentName"/>
+    </resultMap>
+
+    <select id="getByIdObjectType" resultMap="getByIdObjectTypeResponseMap">
+        SELECT T1.id, T1.class_name, T3.id studentId,T3.student_name studentName
+        FROM mybatis_mapper_classroom T1
+                 LEFT JOIN mybatis_mapper_classroom_student T2 ON T1.id = T2.class_id
+                 LEFT JOIN mybatis_mapper_student T3 ON T2.student_id = T3.id
+        WHERE T1.id = #{id}
+    </select>
 </mapper>
 

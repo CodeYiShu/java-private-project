@@ -1,6 +1,8 @@
+
 server:
   servlet:
     context-path: /mapper
+  port: 8081
 
 #数据源配置
 spring:
@@ -12,9 +14,9 @@ spring:
 
 #指定Mybatis映射文件位置
 mybatis:
-  mapper-locations: classpath*:/mapper/**Mapper.xml
+  mapper-locations: classpath*:/dao/**Dao.xml
 
 #SQL日志打印
 logging:
   level:
-    com.codeshu.mapper: DEBUG
+    com.codeshu.dao: DEBUG
