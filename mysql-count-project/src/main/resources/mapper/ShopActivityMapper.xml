@@ -12,12 +12,12 @@
 
     <select id="selectAll" resultMap="shopActivityMap">
         SELECT id,name,type,open_time
-        FROM shop_activity
+        FROM mysql_count_project_shop_activity
     </select>
 
     <select id="getOrderAndRange" resultType="com.codeshu.response.GetOrderAndRangeResponse">
         SELECT type,COUNT(*) as count
-        FROM shop_activity
+        FROM mysql_count_project_shop_activity
         WHERE DATE_FORMAT(open_time,'%Y-%m-%d') BETWEEN #{startDate} AND #{endDate}
         GROUP BY type
         ORDER BY count desc
@@ -26,7 +26,7 @@
 
     <select id="getRange" resultType="com.codeshu.response.GetRangeSingleResponse">
         select DATE_FORMAT(open_time,"%Y-%m-%d") as date,type,count(*) as count
-        from shop_activity
+        from mysql_count_project_shop_activity
         where DATE_FORMAT(open_time,"%Y-%m-%d") between #{startDate} and #{endDate}
         group by DATE_FORMAT(open_time,"%Y-%m-%d"),type
         order by DATE_FORMAT(open_time,"%Y-%m-%d") asc

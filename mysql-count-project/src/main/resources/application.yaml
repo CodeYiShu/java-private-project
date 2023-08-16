@@ -1,3 +1,7 @@
+server:
+  servlet:
+    context-path: /mysql/count
+
 #数据源配置
 spring:
   datasource:

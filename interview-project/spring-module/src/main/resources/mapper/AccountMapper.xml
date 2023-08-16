@@ -4,11 +4,11 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.codeshu.transational.mapper.AccountMapper">
     <select id="findAll" resultType="com.codeshu.transational.entity.AccountEntity">
-        SELECT * FROM account;
+        SELECT * FROM interview_spring_account;
     </select>
 
     <update id="update" parameterType="com.codeshu.transational.entity.AccountEntity">
-        UPDATE account set money = #{money}
+        UPDATE interview_spring_account set money = #{money}
         WHERE id = #{id}
     </update>
 </mapper>

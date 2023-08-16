@@ -5,6 +5,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 
 /**
+ * interview_spring_account
  * @author CodeShu
  * @date 2023/6/8 15:00
  */
