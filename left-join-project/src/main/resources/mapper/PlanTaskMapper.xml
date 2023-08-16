@@ -10,6 +10,6 @@
     </resultMap>
 
     <select id="getAll" resultMap="planTaskMap">
-        SELECT * FROM plan_task;
+        SELECT * FROM left_join_plan_task;
     </select>
 </mapper>

@@ -1,3 +1,6 @@
+server:
+  servlet:
+    context-path: /left/join
 #数据源配置
 spring:
   datasource:

@@ -11,6 +11,6 @@
     </resultMap>
 
     <select id="getAll" resultMap="planMap">
-        SELECT * FROM plan;
+        SELECT * FROM left_join_plan;
     </select>
 </mapper>

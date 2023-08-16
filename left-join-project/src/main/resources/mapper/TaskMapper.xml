@@ -10,14 +10,14 @@
 
     <select id="getAll" resultMap="taskMap">
         SELECT *
-        FROM task
+        FROM left_join_task
     </select>
 
     <select id="getAllByPlanType" resultMap="taskMap">
-        SELECT t.* FROM task as t
+        SELECT t.* FROM left_join_task as t
         <if test="planType != null">
-            JOIN plan_task as pt ON pt.task_id = t.id
-            JOIN plan as p ON pt.plan_id = p.id
+            JOIN left_join_plan_task as pt ON pt.task_id = t.id
+            JOIN left_join_plan as p ON pt.plan_id = p.id
         </if>
         <where>
             <if test="planType != null">
@@ -28,7 +28,7 @@
 
     <!--可以直接从Map中获取-->
     <select id="getByMap" resultMap="taskMap">
-        SELECT * FROM task
+        SELECT * FROM left_join_task
         <where>
             <if test="taskName != null">
                 AND task_name = #{taskName};
@@ -38,7 +38,7 @@
 
     <!--可以直接从对象中获取-->
     <select id="getByObj" resultMap="taskMap">
-        SELECT * FROM task
+        SELECT * FROM left_join_task
         <where>
             <if test="taskName != null">
                 AND task_name = #{taskName};
@@ -48,7 +48,7 @@
 
     <!--可以直接从对象中获取，需要添加上名字前缀-->
     <select id="getByObjWithName" resultMap="taskMap">
-        SELECT * FROM task
+        SELECT * FROM left_join_task
         <where>
             <if test="request.taskName != null">
                 AND task_name = #{request.taskName};
