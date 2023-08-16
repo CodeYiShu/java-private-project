@@ -5,6 +5,7 @@ import com.codeshu.response.UserWithDeptNameResponse;
 import com.codeshu.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.List;
  * @date 2023/1/7 17:45
  */
 @RestController
+@RequestMapping("user")
 public class UserController {
 	@Autowired
 	private UserService userService;

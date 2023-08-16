@@ -10,24 +10,24 @@
 
     <select id="selectAll" resultMap="deptMap">
         SELECT id, dept_name
-        FROM dept;
+        FROM for_sql_warning_dept;
     </select>
 
     <select id="selectById" resultMap="deptMap">
         SELECT id, dept_name
-        FROM dept
+        FROM for_sql_warning_dept
         WHERE id = #{id}
     </select>
 
     <select id="selectInUserId" resultMap="deptMap">
         SELECT id, dept_name
-        FROM dept
+        FROM for_sql_warning_dept
         WHERE id IN (SELECT DISTINCT dept_id FROM user)
     </select>
 
     <select id="selectInUserId2" resultMap="deptMap">
         SELECT id, dept_name
-        FROM dept WHERE id IN (
+        FROM for_sql_warning_dept WHERE id IN (
         SELECT DISTINCT dept_id FROM user
         WHERE id IN
         <foreach collection="userIds" open="(" item="userId" separator=","
@@ -39,7 +39,7 @@
 
     <select id="selectByIds" resultMap="deptMap">
         SELECT id,dept_name
-        FROM dept
+        FROM for_sql_warning_dept
         <where>
             <choose>
                 <when test="ids != null and ids.size > 0">

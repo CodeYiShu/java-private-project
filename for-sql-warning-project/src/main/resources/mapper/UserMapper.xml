@@ -11,6 +11,6 @@
     </resultMap>
 
     <select id="selectAll" resultMap="userMap">
-        SELECT id,name,age,dept_id FROM user;
+        SELECT id,name,age,dept_id FROM for_sql_warning_user;
     </select>
 </mapper>

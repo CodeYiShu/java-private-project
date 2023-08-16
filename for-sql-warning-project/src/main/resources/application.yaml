@@ -1,3 +1,7 @@
+server:
+  servlet:
+    context-path: /for/sql/warning
+
 #数据源配置
 spring:
   datasource:

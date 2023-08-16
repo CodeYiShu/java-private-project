@@ -9,7 +9,7 @@
     </resultMap>
 
     <select id="selectByIds" resultMap="postMap">
-        SELECT * FROM post
+        SELECT * FROM for_sql_warning_post
         <where>
             <choose>
                 <when test="ids != null and ids.size > 0">

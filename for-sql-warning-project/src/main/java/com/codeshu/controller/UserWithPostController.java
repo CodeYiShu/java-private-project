@@ -4,6 +4,7 @@ import com.codeshu.response.UserWithPostResponse;
 import com.codeshu.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.List;
  * @date 2023/1/11 11:18
  */
 @RestController
+@RequestMapping("userWithPost")
 public class UserWithPostController {
 	@Autowired
 	private UserService userService;

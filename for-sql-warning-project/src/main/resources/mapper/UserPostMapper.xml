@@ -10,7 +10,7 @@
     </resultMap>
 
     <select id="selectByUserIds" resultMap="userPostMap">
-        SELECT * FROM user_post
+        SELECT * FROM for_sql_warning_user_post
         <where>
             <choose>
                 <when test="userIds != null and userIds.size > 0">
