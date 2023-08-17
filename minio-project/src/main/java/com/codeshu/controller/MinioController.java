@@ -3,6 +3,7 @@ package com.codeshu.controller;
 import com.codeshu.service.MinioService;
 import com.codeshu.utils.FileTypeUtils;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,6 +29,12 @@ import java.util.Map;
 public class MinioController {
 
 	private final MinioService minioService;
+
+	@Value("${server.port}")
+	private String serverPort;
+
+	@Value("${server.servlet.context-path}")
+	private String serverServletContextPath;
 
 
 	public MinioController(MinioService minioService) {
@@ -72,16 +79,16 @@ public class MinioController {
 	}
 
 	/**
-	 * 列出存储桶中的所有对象名称
+	 * 列出存储桶中的所有对象名称和下载地址
 	 */
 	@GetMapping("/showListObjectNameAndDownloadUrl/{bucketName}")
 	public Map<String, String> showListObjectNameAndDownloadUrl(@PathVariable String bucketName) {
 		Map<String, String> map = new HashMap<>();
 		List<String> listObjectNames = minioService.listObjectNames(bucketName);
-		String url = "localhost:8085/minio/download/" + bucketName + "/";
+		String uploadUrl = "localhost:" + serverPort + serverServletContextPath + "/minio/download/" + bucketName + "/";
 		listObjectNames.forEach(System.out::println);
 		for (String listObjectName : listObjectNames) {
-			map.put(listObjectName, url + listObjectName);
+			map.put(listObjectName, uploadUrl + listObjectName);
 		}
 		return map;
 	}
@@ -114,14 +121,17 @@ public class MinioController {
 	 * 下载文件
 	 */
 	@RequestMapping("/download/{bucketName}/{objectName}")
-	public void download(HttpServletResponse response, @PathVariable("bucketName") String bucketName, @PathVariable("objectName") String objectName) {
+	public void download(HttpServletResponse response,
+						 @PathVariable("bucketName") String bucketName,
+						 @PathVariable("objectName") String objectName) {
 		InputStream in = null;
 		try {
+			//根据桶和对象名，获取此对象文件的输入流
 			in = minioService.downloadObject(bucketName, objectName);
-			response.setHeader("Content-Disposition", "attachment;filename="
-					+ URLEncoder.encode(objectName, "UTF-8"));
+			//设置响应头和字符集
+			response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(objectName, "UTF-8"));
 			response.setCharacterEncoding("UTF-8");
-			//将字节从InputStream复制到OutputStream 。
+			//将字节从 InputStream 复制到 OutputStream，响应给前端
 			IOUtils.copy(in, response.getOutputStream());
 		} catch (IOException e) {
 			e.printStackTrace();

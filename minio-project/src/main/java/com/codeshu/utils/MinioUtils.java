@@ -20,6 +20,7 @@ import io.minio.messages.DeleteError;
 import io.minio.messages.DeleteObject;
 import io.minio.messages.Item;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,6 +33,7 @@ import java.util.concurrent.TimeUnit;
 
 
 @Component
+@Slf4j
 public class MinioUtils {
 
 	private final MinioClient minioClient;
@@ -50,14 +52,7 @@ public class MinioUtils {
 	 */
 	@SneakyThrows
 	public boolean bucketExists(String bucketName) {
-		boolean found =
-				minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
-		if (found) {
-			System.out.println(bucketName + " exists");
-		} else {
-			System.out.println(bucketName + " does not exist");
-		}
-		return found;
+		return minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
 	}
 
 	/**
@@ -67,13 +62,10 @@ public class MinioUtils {
 	 */
 	@SneakyThrows
 	public boolean makeBucket(String bucketName) {
+		// 判断桶是否存在
 		boolean flag = bucketExists(bucketName);
 		if (!flag) {
-			minioClient.makeBucket(
-					MakeBucketArgs.builder()
-							.bucket(bucketName)
-							.build());
-
+			minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
 			return true;
 		} else {
 			return false;
@@ -109,8 +101,10 @@ public class MinioUtils {
 	 */
 	@SneakyThrows
 	public boolean removeBucket(String bucketName) {
+		//判断是否存在
 		boolean flag = bucketExists(bucketName);
 		if (flag) {
+			//获取此桶的所有对象文件
 			Iterable<Result<Item>> myObjects = listObjects(bucketName);
 			for (Result<Item> result : myObjects) {
 				Item item = result.get();
@@ -143,7 +137,7 @@ public class MinioUtils {
 				listObjectNames.add(item.objectName());
 			}
 		} else {
-			listObjectNames.add("存储桶不存在");
+			log.error("桶不存在：{}", bucketName);
 		}
 		return listObjectNames;
 	}
@@ -156,10 +150,11 @@ public class MinioUtils {
 	 */
 	@SneakyThrows
 	public Iterable<Result<Item>> listObjects(String bucketName) {
+		//判断桶是否存在
 		boolean flag = bucketExists(bucketName);
 		if (flag) {
-			return minioClient.listObjects(
-					ListObjectsArgs.builder().bucket(bucketName).build());
+			//获取指定桶的所有对象
+			return minioClient.listObjects(ListObjectsArgs.builder().bucket(bucketName).build());
 		}
 		return null;
 	}
@@ -176,8 +171,8 @@ public class MinioUtils {
 	public void putObject(String bucketName, MultipartFile multipartFile, String filename, String fileType) {
 		InputStream inputStream = new ByteArrayInputStream(multipartFile.getBytes());
 		minioClient.putObject(
-				PutObjectArgs.builder().bucket(bucketName).object(filename).stream(
-								inputStream, -1, minioProperties.getFileSize())
+				PutObjectArgs.builder().bucket(bucketName).object(filename)
+						.stream(inputStream, -1, minioProperties.getFileSize())
 						.contentType(fileType)
 						.build());
 		inputStream.close();
@@ -196,13 +191,10 @@ public class MinioUtils {
 		String url = "";
 		if (flag) {
 			url = minioClient.getPresignedObjectUrl(
-					GetPresignedObjectUrlArgs.builder()
-							.method(Method.GET)
-							.bucket(bucketName)
-							.object(objectName)
+					GetPresignedObjectUrlArgs.builder().method(Method.GET)
+							.bucket(bucketName).object(objectName)
 							.expiry(2, TimeUnit.MINUTES)
 							.build());
-			System.out.println(url);
 		}
 		return url;
 	}
@@ -218,8 +210,7 @@ public class MinioUtils {
 	public boolean removeObject(String bucketName, String objectName) {
 		boolean flag = bucketExists(bucketName);
 		if (flag) {
-			minioClient.removeObject(
-					RemoveObjectArgs.builder().bucket(bucketName).object(objectName).build());
+			minioClient.removeObject(RemoveObjectArgs.builder().bucket(bucketName).object(objectName).build());
 			return true;
 		}
 		return false;
@@ -237,11 +228,7 @@ public class MinioUtils {
 		if (flag) {
 			StatObjectResponse statObject = statObject(bucketName, objectName);
 			if (statObject != null && statObject.size() > 0) {
-				return minioClient.getObject(
-						GetObjectArgs.builder()
-								.bucket(bucketName)
-								.object(objectName)
-								.build());
+				return minioClient.getObject(GetObjectArgs.builder().bucket(bucketName).object(objectName).build());
 			}
 		}
 		return null;
@@ -257,8 +244,7 @@ public class MinioUtils {
 	public StatObjectResponse statObject(String bucketName, String objectName) {
 		boolean flag = bucketExists(bucketName);
 		if (flag) {
-			return minioClient.statObject(
-					StatObjectArgs.builder().bucket(bucketName).object(objectName).build());
+			return minioClient.statObject(StatObjectArgs.builder().bucket(bucketName).object(objectName).build());
 		}
 		return null;
 	}
@@ -277,13 +263,12 @@ public class MinioUtils {
 			for (String objectName : objectNames) {
 				objects.add(new DeleteObject(objectName));
 			}
+			//返回删除错误的对象文件
 			Iterable<Result<DeleteError>> results =
-					minioClient.removeObjects(
-							RemoveObjectsArgs.builder().bucket(bucketName).objects(objects).build());
+					minioClient.removeObjects(RemoveObjectsArgs.builder().bucket(bucketName).objects(objects).build());
 			for (Result<DeleteError> result : results) {
 				DeleteError error = result.get();
-				System.out.println(
-						"Error in deleting object " + error.objectName() + "; " + error.message());
+				System.out.println("Error in deleting object " + error.objectName() + "; " + error.message());
 				return false;
 			}
 		}
@@ -330,8 +315,8 @@ public class MinioUtils {
 		boolean flag = bucketExists(bucketName);
 		if (flag) {
 			minioClient.putObject(
-					PutObjectArgs.builder().bucket(bucketName).object(objectName).stream(
-									inputStream, -1, minioProperties.getFileSize())
+					PutObjectArgs.builder().bucket(bucketName).object(objectName)
+							.stream(inputStream, -1, minioProperties.getFileSize())
 							.contentType(contentType)
 							.build());
 			StatObjectResponse statObject = statObject(bucketName, objectName);

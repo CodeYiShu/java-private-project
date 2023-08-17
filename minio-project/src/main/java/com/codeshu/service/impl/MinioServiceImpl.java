@@ -3,7 +3,6 @@ package com.codeshu.service.impl;
 import com.codeshu.config.MinioProperties;
 import com.codeshu.service.MinioService;
 import com.codeshu.utils.MinioUtils;
-import io.minio.MinioClient;
 import io.minio.messages.Bucket;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -17,12 +16,10 @@ import java.util.UUID;
 public class MinioServiceImpl implements MinioService {
 
 	private final MinioUtils minioUtil;
-	private final MinioClient minioClient;
 	private final MinioProperties minioProperties;
 
-	public MinioServiceImpl(MinioUtils minioUtil, MinioClient minioClient, MinioProperties minioProperties) {
+	public MinioServiceImpl(MinioUtils minioUtil, MinioProperties minioProperties) {
 		this.minioUtil = minioUtil;
-		this.minioClient = minioClient;
 		this.minioProperties = minioProperties;
 	}
 
@@ -65,17 +62,26 @@ public class MinioServiceImpl implements MinioService {
 	@Override
 	public String putObject(MultipartFile file, String bucketName, String fileType) {
 		try {
+			// 如果没传递桶名则获取配置文件配置的默认桶名
 			bucketName = StringUtils.isNotBlank(bucketName) ? bucketName : minioProperties.getBucketName();
+			// 桶不存在则创建桶
 			if (!this.bucketExists(bucketName)) {
 				this.makeBucket(bucketName);
 			}
+			//获取文件名称
 			String fileName = file.getOriginalFilename();
 
 			assert fileName != null;
+			//使用 UUID 来替代文件名称
 			String objectName = UUID.randomUUID().toString().replaceAll("-", "")
 					+ fileName.substring(fileName.lastIndexOf("."));
+
+			//上传文件
 			minioUtil.putObject(bucketName, file, objectName, fileType);
-			return minioProperties.getEndpoint() + "/" + bucketName + "/" + objectName;
+
+			// Minio服务地址/桶名/别名
+			//return minioProperties.getEndpoint() + "/" + bucketName + "/" + objectName;
+			return minioUtil.getObjectUrl(bucketName,objectName);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return "上传失败";
