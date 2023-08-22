@@ -4,6 +4,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledFuture;
+
 /**
  * 配置调度器
  *
@@ -12,6 +15,10 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
  */
 @Configuration
 public class ThreadPoolTaskSchedulerConfig {
+	/**
+	 * 存储所有定时任务
+	 */
+	public static ConcurrentHashMap<String, ScheduledFuture> FUTURE_LIST = new ConcurrentHashMap<>();
 
 	//配置定时任务线程池-自定义名称避免冲突
 	@Bean(name = "myThreadPoolTaskScheduler")
