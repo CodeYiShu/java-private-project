@@ -16,6 +16,7 @@
       <module>servlet-project</module>
       <module>servlet-project</module>
       <module>extend-project</module>
+      <module>interview-project/nio-module</module>
   </modules>
 
   <name>java-private-project</name>
