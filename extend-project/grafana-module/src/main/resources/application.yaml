@@ -1,0 +1,15 @@
+server:
+  port: 8088
+
+management:
+  endpoints:
+    web:
+      exposure:
+        # 暴露端点`/actuator/prometheus`
+        include: 'prometheus'
+  metrics:
+    tags:
+      application: ${spring.application.name}
+spring:
+  application:
+    name: grafana-module
