@@ -62,7 +62,8 @@
                 <artifactId>docker-maven-plugin</artifactId>
                 <version>1.0.0</version>
                 <configuration>
-                    <imageName>com.codeshu.${project.artifactId}</imageName>
+                    <!--镜像名称-->
+                    <imageName>codeshu/${project.artifactId}</imageName>
                     　　<!--指定dockerfile路径-->
                     　　<!--<dockerDirectory>${project.basedir}/src/main/resources</dockerDirectory>-->
                     　　<!--指定标签-->
@@ -73,7 +74,7 @@
                     　　<!--<registryUrl>123.123.123.123:5000</registryUrl>-->
                     　　<!--<pushImage>true</pushImage>-->
                     　　<!--基础镜像jdk1.8-->
-                    <baseImage>java:8</baseImage>
+                    <baseImage>openjdk:8</baseImage>
                     　　<!--制作者提供本人信息-->
                     <maintainer>13828965090@163.com</maintainer>
                     　　<!--切换到ROOT目录-->
