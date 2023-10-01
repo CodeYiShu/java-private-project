@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: node-affinity
+spec:
+  containers:
+    - name: nginx
+      image: nginx:1.19
+      ports:
+        - containerPort: 80
+  affinity:
+    podAffinity:
+#      requiredDuringSchedulingIgnoredDuringExecution:
+#        - topologyKey: cpu
+#          labelSelector:
+#            matchExpressions:
+#              - key: app
+#                operator: In
+#                values:
+#                  - nginx
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - podAffinityTerm:
+            topologyKey: cpu
+            labelSelector:
+              matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                    - aaa
+          weight: 1
+        - podAffinityTerm:
+             topologyKey: cpu
+             labelSelector:
+               matchExpressions:
+                 - key: app
+                   operator: In
+                   values:
+                     - bbb
+          weight: 2
