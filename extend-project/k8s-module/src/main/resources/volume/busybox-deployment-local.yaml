@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: busybox-deployment
+  labels:
+    app: busybox-deployment-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: busybox-pod-app
+  template:
+    metadata:
+      name: busybox-pod
+      labels:
+        app: busybox-pod-app
+    spec:
+      containers:
+        - name: writer-busybox-container
+          image: busybox:1.28
+          command: [ "/bin/sh", "-c", "echo 'Hello World!' > /data/hello.txt ; sleep 3600" ]
+          volumeMounts:
+            - mountPath: /data
+              name: local-volume
+        - name: reader-busybox-container
+          image: busybox:1.28
+          command: [ "/bin/sh", "-c", "cat /data/hello.txt ; sleep 3600" ]
+          volumeMounts:
+            - mountPath: /data
+              name: local-volume
+      # 为 Pod 定义 local 卷
+      volumes:
+        - name: local-volume
+          hostPath:
+            path: /home/k8s/volume/local-volume

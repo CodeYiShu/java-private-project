@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: busybox-deployment
+  labels:
+    app: busybox-deployment-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: busybox-pod-app
+  template:
+    metadata:
+      name: busybox-pod
+      labels:
+        app: busybox-pod-app
+    spec:
+      containers:
+        - name: writer-busybox-container
+          image: busybox:1.28
+          command: [ "/bin/sh", "-c", "echo 'Hello World!' > /data/hello.txt ; sleep 3600" ]
+          volumeMounts:
+            - mountPath: /data
+              name: nfs-volume
+        - name: reader-busybox-container
+          image: busybox:1.28
+          command: [ "/bin/sh", "-c", "cat /data/hello.txt ; sleep 3600" ]
+          volumeMounts:
+            - mountPath: /data
+              name: nfs-volume
+      # 为 Pod 定义 nfs 卷
+      volumes:
+        - name: nfs-volume
+          nfs:
+            path: /root/nfs/data
+            server: 175.178.113.82

@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx-deployment-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx-pod-app
+  template:
+    metadata:
+      name: nginx-pod
+      labels:
+        app: nginx-pod-app
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.19
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  selector:
+    app: nginx-pod-app
+  ports:
+    - name: write
+      protocol: TCP
+      port: 8081
+      targetPort: 80
+      nodePort: 30001
+    - name: read
+      protocol: TCP
+      port: 8082
+      targetPort: 80
+      nodePort: 30002
+  type: NodePort
