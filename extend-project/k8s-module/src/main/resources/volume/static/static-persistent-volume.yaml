@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nfs-pv
+spec:
+  capacity:
+    storage: 1Gi #指定容量大小
+  accessModes: # 访问模式
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs-pv
+  nfs:
+    path: /root/nfs/data
+    server: 175.178.113.82

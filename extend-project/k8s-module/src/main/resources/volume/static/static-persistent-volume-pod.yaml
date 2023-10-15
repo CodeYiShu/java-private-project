@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox-pod
+spec:
+  containers:
+    - name: busybox-container
+      image: busybox
+      command: ["/bin/sh"]
+      args: ["-c", "while true; do echo 'Hello NFS!' >> /data/index.html; sleep 1; done"]
+      volumeMounts:
+        - name: nfs-volume
+          mountPath: /data
+  volumes:
+    - name: nfs-volume
+      persistentVolumeClaim:
+        claimName: nfs-pvc
