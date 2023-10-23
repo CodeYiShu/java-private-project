@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql-statefulset
+spec:
+  serviceName: mysql #headless 无头服务  保证网络标识符唯一  必须存在
+  replicas: 2
+  template:
+    metadata:
+      name: mysql-pod
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: mysql-container
+          image: mysql/mysql-server:8.0
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: root
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: nfs-volume
+          ports:
+            - containerPort: 3306
+      restartPolicy: Always
+  volumeClaimTemplates: #声明动态创建数据卷模板
+    - metadata:
+        name: nfs-volume
+      spec:
+        accessModes: # 访问数据卷模式是什么
+          - ReadWriteMany
+        storageClassName: mysql-nfs-sc # 使用哪个 storage class 模板存储数据
+        resources:
+          requests:
+            storage: 1G
+  selector:
+    matchLabels:
+      app: mysql
