@@ -1,0 +1,11 @@
+server:
+  port: 8088
+
+xf:
+  config:
+    hostUrl: https://spark-api.xf-yun.com/v3.1/chat
+    appid: xx
+    apiSecret: xx
+    apiKey: xx
+    # 最大响应时间 单位秒
+    maxResponseTime: 30
