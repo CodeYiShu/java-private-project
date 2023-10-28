@@ -86,7 +86,7 @@ public class XFWebSocketListener extends WebSocketListener {
 		if (myJsonParse.getHeader().getStatus() == 2) {
 			isWsCloseFlag = true;
 			//todo 将问答信息入库进行记录，可自行实现，这里模拟存储到缓存
-			log.info("返回的回答（完整）", this.answer.toString());
+			log.info("返回的回答（完整）：【{}】", this.answer.toString());
 			//存入新回答
 			QuestionAndAnswerCache.addQuestionOrAnswer(uid, answer.toString(), "assistant");
 		}
