@@ -3,6 +3,8 @@ package com.codeshu.controller;
 import com.codeshu.cache.QuestionAndAnswerCache;
 import com.codeshu.config.XFConfigProperties;
 import com.codeshu.config.XFWebSocketClient;
+import com.codeshu.dao.AiUserDao;
+import com.codeshu.entity.AiUser;
 import com.codeshu.request.AskQuestionRequest;
 import com.codeshu.websocket.XFWebSocketListener;
 import com.codeshu.xfbean.RoleContent;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -28,6 +31,8 @@ public class XFController {
 	private XFWebSocketClient xfWebSocketClient;
 	@Autowired
 	private XFConfigProperties xfConfigProperties;
+	@Resource
+	private AiUserDao userDao;
 
 	@GetMapping("askQuestion")
 	public String askQuestion(AskQuestionRequest request) {
@@ -75,5 +80,10 @@ public class XFController {
 	@GetMapping("/getAllQuestionAnswer/{uid}")
 	public List<RoleContent> getAllQuestionAnswer(@PathVariable("uid") String uid) {
 		return QuestionAndAnswerCache.getAllQuestionAnswer(uid);
+	}
+
+	@GetMapping("/getUser")
+	public List<AiUser> getUser() {
+		return userDao.selectList(null);
 	}
 }

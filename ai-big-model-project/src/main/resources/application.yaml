@@ -9,3 +9,20 @@ xf:
     apiKey: xx
     # 最大响应时间 单位秒
     maxResponseTime: 30
+
+#数据源配置
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/java-private-project?useUnicode=true&useSSL=false&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+
+#指定Mybatis映射文件位置
+mybatis:
+  mapper-locations: classpath*:/dao/**Dao.xml
+
+#SQL日志打印
+logging:
+  level:
+    com.codeshu.dao: DEBUG
