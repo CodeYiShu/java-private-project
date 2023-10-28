@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.util.List;
 
 /**
+ * WebSocket 监听器
+ *
  * @author CodeShu
  * @date 2023/10/27 11:41
  */
@@ -28,12 +30,14 @@ public class XFWebSocketListener extends WebSocketListener {
 	private String uid;
 
 	/**
-	 * 大模型的回答
+	 * 大模型的回答内容
 	 */
 	private StringBuilder answer = new StringBuilder();
 
 	/**
-	 * 大模型请求是否已经回答 true-回复 否-尚未回复
+	 * 大模型请求是否已经回答
+	 * <p>
+	 * true-回复 false-尚未回复
 	 */
 	private Boolean isWsCloseFlag = false;
 
@@ -45,7 +49,7 @@ public class XFWebSocketListener extends WebSocketListener {
 	}
 
 	/**
-	 * 建立连接事触发
+	 * 建立连接时触发
 	 */
 	@Override
 	@SuppressWarnings("all")
@@ -55,13 +59,13 @@ public class XFWebSocketListener extends WebSocketListener {
 	}
 
 	/**
-	 * 收到消息回调
+	 * 收到回答消息的回调
 	 */
 	@Override
 	@SuppressWarnings("all")
 	public void onMessage(WebSocket webSocket, String text) {
 		super.onMessage(webSocket, text);
-		//获取大模型的返回结果
+		// 获取大模型的返回结果
 		JsonParse myJsonParse = JSON.parseObject(text, JsonParse.class);
 		log.info("myJsonParse:{}", JSON.toJSONString(myJsonParse));
 		if (myJsonParse.getHeader().getCode() != 0) {
@@ -71,19 +75,19 @@ public class XFWebSocketListener extends WebSocketListener {
 			isWsCloseFlag = true;
 			return;
 		}
-		//获取出回答，可能回答长，所以可能会放到多个Text，拼接起来
-		List<Text> textList = myJsonParse.getPayload().getChoices().getText();
-		for (Text temp : textList) {
-			log.info("返回结果信息为：【{}】", JSON.toJSONString(temp));
-			this.answer.append(temp.getContent());
+		//获取出回答，可能回答长，所以可能会放到多个 Text，拼接起来
+		List<Text> answerList = myJsonParse.getPayload().getChoices().getText();
+		for (Text splitAnswer : answerList) {
+			log.info("返回的回答（分片）：【{}】", JSON.toJSONString(splitAnswer));
+			this.answer.append(splitAnswer.getContent());
 		}
 
 		//为 2 表示回答完毕，可以关闭掉 WebSocket 请求
 		if (myJsonParse.getHeader().getStatus() == 2) {
 			isWsCloseFlag = true;
 			//todo 将问答信息入库进行记录，可自行实现，这里模拟存储到缓存
+			log.info("返回的回答（完整）", this.answer.toString());
 			//存入新回答
-			log.info("result:{}", this.answer.toString());
 			QuestionAndAnswerCache.addQuestionOrAnswer(uid, answer.toString(), "assistant");
 		}
 	}

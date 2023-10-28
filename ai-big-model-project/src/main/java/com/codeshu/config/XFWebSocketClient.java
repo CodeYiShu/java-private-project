@@ -25,6 +25,8 @@ import java.util.Objects;
 import java.util.TimeZone;
 
 /**
+ * 通过 WebSocket 向大模型发送提问
+ *
  * @author CodeShu
  * @date 2023/10/27 10:32
  */
@@ -39,7 +41,7 @@ public class XFWebSocketClient {
 	 *
 	 * @param uid                   用户ID
 	 * @param questionAndAnswerList 历史的问题和回答 + 最后一条新问题
-	 * @param listener              指定 Websocket 监听器
+	 * @param listener              指定 WebSocket 监听器
 	 **/
 	public WebSocket sendMsg(String uid, List<RoleContent> questionAndAnswerList, WebSocketListener listener) {
 		String authUrl;
@@ -52,14 +54,14 @@ public class XFWebSocketClient {
 			return null;
 		}
 		OkHttpClient okHttpClient = new OkHttpClient.Builder().build();
-		// 将 https/http 连接替换为 ws/wss 连接
+		// 将 https/http 连接替换为 ws/wss 连接（WebSocket）
 		String url = authUrl.replace("http://", "ws://").replace("https://", "wss://");
 		Request request = new Request.Builder().url(url).build();
 		// 指定请求对象和监听器，建立 wss 连接
 		WebSocket webSocket = okHttpClient.newWebSocket(request, listener);
 		// 组装请求参数
 		JSONObject requestDTO = createRequestParams(uid, questionAndAnswerList);
-		// 指定请求参数，发送请求
+		// 指定请求参数，发送请求，下一步就是到指定监听器
 		webSocket.send(JSONObject.toJSONString(requestDTO));
 		return webSocket;
 	}
@@ -82,7 +84,6 @@ public class XFWebSocketClient {
 		String preStr = "host: " + url.getHost() + "\n" +
 				"date: " + date + "\n" +
 				"GET " + url.getPath() + " HTTP/1.1";
-		// System.err.println(preStr);
 		// SHA256加密
 		Mac mac = Mac.getInstance("hmacsha256");
 		SecretKeySpec spec = new SecretKeySpec(apiSecret.getBytes(StandardCharsets.UTF_8), "hmacsha256");
@@ -91,7 +92,6 @@ public class XFWebSocketClient {
 		byte[] hexDigits = mac.doFinal(preStr.getBytes(StandardCharsets.UTF_8));
 		// Base64加密
 		String sha = Base64.getEncoder().encodeToString(hexDigits);
-		// System.err.println(sha);
 		// 拼接
 		String authorization = String.format("api_key=\"%s\", algorithm=\"%s\", headers=\"%s\", signature=\"%s\"", apiKey, "hmac-sha256", "host date request-line", sha);
 		// 拼接地址
@@ -101,7 +101,6 @@ public class XFWebSocketClient {
 				addQueryParameter("host", url.getHost()).//
 				build();
 
-		// System.err.println(httpUrl.toString());
 		return httpUrl.toString();
 	}
 
@@ -114,6 +113,7 @@ public class XFWebSocketClient {
 		JSONObject header = new JSONObject();
 		header.put("app_id", xfConfigProperties.getAppid());
 		header.put("uid", uid);
+
 		// parameter参数
 		JSONObject parameter = new JSONObject();
 		JSONObject chat = new JSONObject();
@@ -121,14 +121,16 @@ public class XFWebSocketClient {
 		chat.put("temperature", 0.5);
 		chat.put("max_tokens", 4096);
 		parameter.put("chat", chat);
+
 		// payload参数
 		JSONObject payload = new JSONObject();
 		JSONObject message = new JSONObject();
+		// 此用户的所有历史提问和回答 + 最新一条提问
 		JSONArray text = new JSONArray();
 		text.addAll(questionAndAnswerList);
-
 		message.put("text", text);
 		payload.put("message", message);
+
 		requestJson.put("header", header);
 		requestJson.put("parameter", parameter);
 		requestJson.put("payload", payload);

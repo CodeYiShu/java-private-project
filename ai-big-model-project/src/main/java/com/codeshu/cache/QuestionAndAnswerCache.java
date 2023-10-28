@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 用户所提出的所有问题和 AI 的所有回答
+ * 用户所提出的所有问题和 AI 的所有回答（可用 MySQL 替换）
  *
  * @author CodeShu
  * @date 2023/10/27 13:54

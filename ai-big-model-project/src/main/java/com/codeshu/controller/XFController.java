@@ -30,28 +30,27 @@ public class XFController {
 	private XFConfigProperties xfConfigProperties;
 
 	@GetMapping("askQuestion")
-	public String sendMsg(AskQuestionRequest request) {
-		//存入新问题
+	public String askQuestion(AskQuestionRequest request) {
+		// 存入新问题
 		QuestionAndAnswerCache.addQuestionOrAnswer(request.getUid(), request.getQuestion(), "user");
-		//将此用户所有提过的问题和回答获取出来，让 AI 可以根据以往的提问和回答
+		// 获取出此用户的所有历史提问和回答 + 最新一条提问，让 AI 可以根据以往的提问和回答进行回答
 		List<RoleContent> questionAndAnswerList = QuestionAndAnswerCache.getAllQuestionAnswer(request.getUid());
 
-		//创建监听器
+		// 创建监听器
 		XFWebSocketListener listener = new XFWebSocketListener(request.getUid());
-		//建立与大模型的 Socket 连接发起提问
+		// 建立与大模型的 WebSocket 连接发起提问，下一步走指定的监听器
 		WebSocket webSocket = xfWebSocketClient.sendMsg(request.getUid(), questionAndAnswerList, listener);
 		if (webSocket == null) {
 			log.error("webSocket连接异常");
 			return "webSocket连接异常";
 		}
 		try {
-			//循环等待大模型的返回
-			//若指定时间内未返回，则返回请求失败至前端，这里设置成 200 * 5 * 30= 30000 ms（30 s）
+			// 循环等待大模型的返回，若指定时间内未返回，则返回请求失败至前端，这里设置成 200 * 5 * 30= 30000 ms（30 s）
 			int count = 0;
 			int maxCount = xfConfigProperties.getMaxResponseTime() * 5;
 			while (count <= maxCount) {
 				Thread.sleep(200);
-				//在监听器中被设置为 true 则表示已经收到回答结果
+				// 在监听器中被设置为 true 则表示已经收到回答结果
 				if (listener.getIsWsCloseFlag()) {
 					break;
 				}
@@ -63,10 +62,10 @@ public class XFController {
 		} catch (Exception e) {
 			log.error("请求异常：{}", e);
 		} finally {
-			//关闭 WebSocket 连接
+			// 关闭 WebSocket 连接
 			webSocket.close(1000, "");
 		}
-		//从监听器中获取出回答
+		// 从监听器中获取出回答
 		return listener.getAnswer().toString();
 	}
 
