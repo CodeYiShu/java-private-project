@@ -21,7 +21,7 @@ public interface AiRoleContentService {
 	/**
 	 * 获取用户的所有提问和回答
 	 */
-	List<AiRoleContent> getByUserId(Long userId);
+	List<AiRoleContent> getByUid(String uid);
 
 	/**
 	 * 插入提问和回答

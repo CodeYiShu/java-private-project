@@ -91,7 +91,7 @@ public class XFWebSocketListener extends WebSocketListener {
 			log.info("返回的回答（完整）：【{}】", this.answer.toString());
 			//存入新回答
 			AiRoleContent aiRoleContent = new AiRoleContent();
-			aiRoleContent.setUserId(Long.valueOf(uid));
+			aiRoleContent.setUid(uid);
 			aiRoleContent.setContent(answer.toString());
 			aiRoleContent.setRole("assistant");
 			SpringApplicationContextHolder.getBeanByClass(AiRoleContentService.class).insert(aiRoleContent);

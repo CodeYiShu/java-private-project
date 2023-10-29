@@ -8,6 +8,7 @@ import com.codeshu.service.AiRoleContentService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -27,19 +28,20 @@ public class AiRoleContentServiceImpl implements AiRoleContentService {
 	public PageInfo<AiRoleContent> getAllQuestionAnswer(GetAllQuestionAnswerRequest request) {
 		PageHelper.startPage(request.getPageNum(), request.getPageSize());
 		LambdaQueryWrapper<AiRoleContent> queryWrapper = new LambdaQueryWrapper<>();
-		queryWrapper.eq(AiRoleContent::getUserId, request.getUid());
+		queryWrapper.eq(AiRoleContent::getUid, request.getUid());
 		List<AiRoleContent> contentList = dao.selectList(queryWrapper);
 		return new PageInfo<>(contentList);
 	}
 
 	@Override
-	public List<AiRoleContent> getByUserId(Long userId) {
+	public List<AiRoleContent> getByUid(String uid) {
 		LambdaQueryWrapper<AiRoleContent> queryWrapper = new LambdaQueryWrapper<>();
-		queryWrapper.eq(AiRoleContent::getUserId, userId);
+		queryWrapper.eq(AiRoleContent::getUid, uid);
 		return dao.selectList(queryWrapper);
 	}
 
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public void insert(AiRoleContent aiRoleContent) {
 		dao.insert(aiRoleContent);
 	}

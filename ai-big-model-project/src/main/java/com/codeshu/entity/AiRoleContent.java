@@ -16,9 +16,11 @@ import java.io.Serializable;
 public class AiRoleContent implements Serializable {
 	private static final long serialVersionUID = 381561358949283595L;
 	@TableId(type = IdType.ASSIGN_ID)
-	private Long id;
-
-	private Long userId;
+	private String id;
+	/**
+	 * 用户ID
+	 */
+	private String uid;
 	/**
 	 * 角色 user-表示用户的提问 assistant-表示 AI 的回答
 	 */

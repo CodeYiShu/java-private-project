@@ -10,5 +10,5 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class GetAllQuestionAnswerRequest extends BasePageRequest {
-	private Long uid;
+	private String uid;
 }

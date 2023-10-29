@@ -4,6 +4,7 @@ import com.codeshu.config.XFConfigProperties;
 import com.codeshu.config.XFWebSocketClient;
 import com.codeshu.entity.AiRoleContent;
 import com.codeshu.request.AskQuestionRequest;
+import com.codeshu.response.CommonResult;
 import com.codeshu.service.AiRoleContentService;
 import com.codeshu.utils.ConvertUtils;
 import com.codeshu.websocket.XFWebSocketListener;
@@ -27,32 +28,34 @@ import java.util.List;
 public class XFController {
 	@Autowired
 	private XFWebSocketClient xfWebSocketClient;
+
 	@Autowired
 	private XFConfigProperties xfConfigProperties;
+
 	@Autowired
 	private AiRoleContentService aiRoleContentService;
 
 	@GetMapping("askQuestion")
-	public String askQuestion(AskQuestionRequest request) {
+	public CommonResult askQuestion(AskQuestionRequest request) {
 		// 存入新问题
 		AiRoleContent aiRoleContent = new AiRoleContent();
-		aiRoleContent.setUserId(request.getUid());
+		aiRoleContent.setUid(request.getUid());
 		aiRoleContent.setContent(request.getQuestion());
 		aiRoleContent.setRole("user");
 		aiRoleContentService.insert(aiRoleContent);
 
 		// 获取出此用户的所有历史提问和回答 + 最新一条提问，让 AI 可以根据以往的提问和回答进行回答
-		List<AiRoleContent> dbQuestionAndAnswerList = aiRoleContentService.getByUserId(request.getUid());
+		List<AiRoleContent> dbQuestionAndAnswerList = aiRoleContentService.getByUid(request.getUid());
 		List<RoleContent> questionAndAnswerList = ConvertUtils.sourceToTarget(dbQuestionAndAnswerList, RoleContent.class);
 
 		// 创建监听器
-		XFWebSocketListener listener = new XFWebSocketListener(String.valueOf(request.getUid()));
+		XFWebSocketListener listener = new XFWebSocketListener(request.getUid());
 
 		// 建立与大模型的 WebSocket 连接发起提问，下一步走指定的监听器
-		WebSocket webSocket = xfWebSocketClient.sendMsg(String.valueOf(String.valueOf(request.getUid())), questionAndAnswerList, listener);
+		WebSocket webSocket = xfWebSocketClient.sendMsg(request.getUid(), questionAndAnswerList, listener);
 		if (webSocket == null) {
 			log.error("webSocket连接异常");
-			return "webSocket连接异常";
+			return CommonResult.fail("webSocket连接异常");
 		}
 		try {
 			// 循环等待大模型的返回，若指定时间内未返回，则返回请求失败至前端，这里设置成 200 * 5 * 30= 30000 ms（30 s）
@@ -76,6 +79,6 @@ public class XFController {
 			webSocket.close(1000, "");
 		}
 		// 从监听器中获取出回答
-		return listener.getAnswer().toString();
+		return CommonResult.success(listener.getAnswer().toString());
 	}
 }

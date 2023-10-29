@@ -16,7 +16,7 @@ import java.io.Serializable;
 public class AiUser implements Serializable {
 	private static final long serialVersionUID = -98738441642715845L;
 	@TableId(type = IdType.ASSIGN_ID)
-	private Long id;
+	private String id;
 
 	private String username;
 }

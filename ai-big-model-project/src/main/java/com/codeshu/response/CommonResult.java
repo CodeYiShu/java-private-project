@@ -30,11 +30,6 @@ public class CommonResult {
 		return success(200, "操作成功", data);
 	}
 
-	public static CommonResult success(String message) {
-		//响应状态码200，message为操作成功，data可能是用户对象等数据
-		return success(200, message, null);
-	}
-
 	public static CommonResult success(int code, String message, Object data) {
 		//自定义响应状态码、message和data
 		CommonResult result = new CommonResult();
