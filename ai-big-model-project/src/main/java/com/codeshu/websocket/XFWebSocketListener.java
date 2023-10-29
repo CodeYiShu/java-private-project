@@ -1,7 +1,9 @@
 package com.codeshu.websocket;
 
 import com.alibaba.fastjson.JSON;
-import com.codeshu.cache.QuestionAndAnswerCache;
+import com.codeshu.entity.AiRoleContent;
+import com.codeshu.service.AiRoleContentService;
+import com.codeshu.utils.SpringApplicationContextHolder;
 import com.codeshu.xfbean.JsonParse;
 import com.codeshu.xfbean.Text;
 import lombok.Data;
@@ -88,7 +90,11 @@ public class XFWebSocketListener extends WebSocketListener {
 			//todo 将问答信息入库进行记录，可自行实现，这里模拟存储到缓存
 			log.info("返回的回答（完整）：【{}】", this.answer.toString());
 			//存入新回答
-			QuestionAndAnswerCache.addQuestionOrAnswer(uid, answer.toString(), "assistant");
+			AiRoleContent aiRoleContent = new AiRoleContent();
+			aiRoleContent.setUserId(Long.valueOf(uid));
+			aiRoleContent.setContent(answer.toString());
+			aiRoleContent.setRole("assistant");
+			SpringApplicationContextHolder.getBeanByClass(AiRoleContentService.class).insert(aiRoleContent);
 		}
 	}
 

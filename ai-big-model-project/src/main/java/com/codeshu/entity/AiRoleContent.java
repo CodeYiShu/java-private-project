@@ -1,5 +1,7 @@
 package com.codeshu.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -13,7 +15,7 @@ import java.io.Serializable;
 @Data
 public class AiRoleContent implements Serializable {
 	private static final long serialVersionUID = 381561358949283595L;
-
+	@TableId(type = IdType.ASSIGN_ID)
 	private Long id;
 
 	private Long userId;

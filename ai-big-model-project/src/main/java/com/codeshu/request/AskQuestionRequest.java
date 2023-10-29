@@ -13,7 +13,7 @@ public class AskQuestionRequest {
 	/**
 	 * 用户ID
 	 */
-	private String uid;
+	private Long uid;
 
 	/**
 	 * 提问

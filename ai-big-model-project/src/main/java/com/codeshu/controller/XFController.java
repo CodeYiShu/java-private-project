@@ -1,22 +1,20 @@
 package com.codeshu.controller;
 
-import com.codeshu.cache.QuestionAndAnswerCache;
 import com.codeshu.config.XFConfigProperties;
 import com.codeshu.config.XFWebSocketClient;
-import com.codeshu.dao.AiUserDao;
-import com.codeshu.entity.AiUser;
+import com.codeshu.entity.AiRoleContent;
 import com.codeshu.request.AskQuestionRequest;
+import com.codeshu.service.AiRoleContentService;
+import com.codeshu.utils.ConvertUtils;
 import com.codeshu.websocket.XFWebSocketListener;
 import com.codeshu.xfbean.RoleContent;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.WebSocket;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -31,20 +29,27 @@ public class XFController {
 	private XFWebSocketClient xfWebSocketClient;
 	@Autowired
 	private XFConfigProperties xfConfigProperties;
-	@Resource
-	private AiUserDao userDao;
+	@Autowired
+	private AiRoleContentService aiRoleContentService;
 
 	@GetMapping("askQuestion")
 	public String askQuestion(AskQuestionRequest request) {
 		// 存入新问题
-		QuestionAndAnswerCache.addQuestionOrAnswer(request.getUid(), request.getQuestion(), "user");
+		AiRoleContent aiRoleContent = new AiRoleContent();
+		aiRoleContent.setUserId(request.getUid());
+		aiRoleContent.setContent(request.getQuestion());
+		aiRoleContent.setRole("user");
+		aiRoleContentService.insert(aiRoleContent);
+
 		// 获取出此用户的所有历史提问和回答 + 最新一条提问，让 AI 可以根据以往的提问和回答进行回答
-		List<RoleContent> questionAndAnswerList = QuestionAndAnswerCache.getAllQuestionAnswer(request.getUid());
+		List<AiRoleContent> dbQuestionAndAnswerList = aiRoleContentService.getByUserId(request.getUid());
+		List<RoleContent> questionAndAnswerList = ConvertUtils.sourceToTarget(dbQuestionAndAnswerList, RoleContent.class);
 
 		// 创建监听器
-		XFWebSocketListener listener = new XFWebSocketListener(request.getUid());
+		XFWebSocketListener listener = new XFWebSocketListener(String.valueOf(request.getUid()));
+
 		// 建立与大模型的 WebSocket 连接发起提问，下一步走指定的监听器
-		WebSocket webSocket = xfWebSocketClient.sendMsg(request.getUid(), questionAndAnswerList, listener);
+		WebSocket webSocket = xfWebSocketClient.sendMsg(String.valueOf(String.valueOf(request.getUid())), questionAndAnswerList, listener);
 		if (webSocket == null) {
 			log.error("webSocket连接异常");
 			return "webSocket连接异常";
@@ -72,18 +77,5 @@ public class XFController {
 		}
 		// 从监听器中获取出回答
 		return listener.getAnswer().toString();
-	}
-
-	/**
-	 * 获取用户的所有提问和回答
-	 */
-	@GetMapping("/getAllQuestionAnswer/{uid}")
-	public List<RoleContent> getAllQuestionAnswer(@PathVariable("uid") String uid) {
-		return QuestionAndAnswerCache.getAllQuestionAnswer(uid);
-	}
-
-	@GetMapping("/getUser")
-	public List<AiUser> getUser() {
-		return userDao.selectList(null);
 	}
 }
