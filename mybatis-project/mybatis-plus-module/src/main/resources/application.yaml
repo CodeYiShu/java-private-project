@@ -1,35 +1,20 @@
 server:
-  port: 8088
-
-xf:
-  config:
-    hostUrl: https://spark-api.xf-yun.com/v3.1/chat
-    appid: xx
-    apiSecret: xx
-    apiKey: xx
-    # 最大响应时间 单位秒
-    maxResponseTime: 30
+  port: 8099
 
 #数据源配置
 spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
+    # &allowMultiQueries=false
     url: jdbc:mysql://localhost:3306/java-private-project?useUnicode=true&useSSL=false&characterEncoding=utf8&serverTimezone=Asia/Shanghai
     username: root
     password: 123456
 
 #指定Mybatis映射文件位置
 mybatis:
-  mapper-locations: classpath*:/mapper/**Dao.xml
+  mapper-locations: classpath*:/dao/**Dao.xml
 
 #SQL日志打印
 logging:
   level:
     com.codeshu.dao: DEBUG
-
-#分页配置
-pagehelper:
-  helper-dialect: mysql
-  reasonable: true
-  support-methods-arguments: true
-  params: count=countSql
