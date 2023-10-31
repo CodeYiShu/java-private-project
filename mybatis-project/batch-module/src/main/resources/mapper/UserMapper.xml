@@ -14,11 +14,11 @@
     </select>
 
     <insert id="insertBatch" parameterType="com.codeshu.entity.UserEntity">
-        INSERT INTO mybatis_batch_user(username)
-        VALUES
-        <foreach collection="userEntityList" item="userEntity" separator=",">
-            (#{userEntity.username})
-        </foreach>
+<!--        INSERT INTO mybatis_batch_user(username)-->
+<!--        VALUES-->
+<!--        <foreach collection="userEntityList" item="userEntity" separator=",">-->
+<!--            (#{userEntity.username})-->
+<!--        </foreach>-->
     </insert>
 
     <update id="updateBatch" parameterType="com.codeshu.entity.UserEntity">
