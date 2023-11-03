@@ -4,6 +4,7 @@ import com.codeshu.common.MyBaseServiceImpl;
 import com.codeshu.dao.UserDao;
 import com.codeshu.entity.User;
 import com.codeshu.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**

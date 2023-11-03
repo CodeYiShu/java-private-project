@@ -3,6 +3,7 @@ package com.codeshu.generate;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.codeshu.generate.bean.EquipSon;
+import com.codeshu.generate.bean.TDwEnterpriceLabel;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -32,6 +33,12 @@ public class GenerateUtils {
 		System.out.println(generateUpdateBatchByIdSQL2(new EquipSon(),
 						"BYDBC_CONTROL.TFHJ_EQUIP_SON",
 						"com.grkj.modules.tfhjsjyj.entity"
+				)
+		);
+		System.out.println("----------------------------------------------------------------------------");
+		System.out.println(generateInsertBatchSQL(new TDwEnterpriceLabel(),
+						"BYDBC_STANDARD.T_DW_ENTERPRISE_LABLE",
+						"com.grkj.modules.tfhjsjyj.controller"
 				)
 		);
 	}

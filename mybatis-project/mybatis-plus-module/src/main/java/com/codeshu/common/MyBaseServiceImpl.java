@@ -1,8 +1,8 @@
 package com.codeshu.common;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -14,8 +14,13 @@ import java.util.List;
  * @date 2023/10/30 15:05
  */
 public class MyBaseServiceImpl<M extends MyBaseMapper<T>, T> extends ServiceImpl<M, T> implements MyIBaseService<T> {
-	@Resource
+	@Autowired
 	protected M baseDao;
+
+	@Override
+	public M getBaseMapper() {
+		return baseDao;
+	}
 
 	@Override
 	public int insertBatch(List<T> entityList) {
