@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: springboot-pod
+spec:
+  containers:
+    - name: springboot-container
+      image: springboot-image
+      command: [ "java", "-jar","-app.jar", "--spring.config.location=","/app/config/application.yaml" ]
+      volumeMounts:
+        - mountPath: config-volume
+          name: /app/config
+  volumes:
+    - name: config-volume
+      configMap:
+        name: springboot-config
