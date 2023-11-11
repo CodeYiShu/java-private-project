@@ -1,0 +1,14 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: 路由名称
+  namespace: default
+spec:
+  entryPoints:
+    - traefix-deployment.yaml中的entrypoints.xxx.Address的xxx
+  routes:
+    - match: Host(`运行 ingress Controller 的主机`) && PathPrefix(`/notls`)
+      kind: Rule
+      services:
+        - name: 交给哪个 Service
+          port: Service 监听的端口

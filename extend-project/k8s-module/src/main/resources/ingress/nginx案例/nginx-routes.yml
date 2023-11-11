@@ -1,0 +1,32 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: nginx-web-routes
+  namespace: default
+spec:
+  entryPoints:
+    - nginxweb
+  routes:
+    - match: Host(`k8snode2.com`)
+      kind: Rule
+      services:
+        - name: nginx-service
+          port: 80
+
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: nginx-secure-routes
+  namespace: default
+spec:
+  entryPoints:
+    - nginxsecure
+  routes:
+    - match: Host(`k8snode2.com`)
+      kind: Rule
+      services:
+        - name: nginx-service
+          port: 80
+  tls:
+    certResolver: myresolver
