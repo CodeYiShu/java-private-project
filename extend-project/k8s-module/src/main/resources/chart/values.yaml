@@ -1,0 +1,11 @@
+namespace: nginx-namespace
+deployment:
+  name: nginx-deployment
+replicas: 1
+pod:
+  name: nginx-pod
+  labelValue: nginx
+container:
+  name: nginx-container
+  image: nginx:1.19
+  containerPort: 80
