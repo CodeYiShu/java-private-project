@@ -3,7 +3,6 @@ package com.codeshu.utils;
 import com.codeshu.config.MinioProperties;
 import io.minio.BucketExistsArgs;
 import io.minio.GetObjectArgs;
-import io.minio.GetPresignedObjectUrlArgs;
 import io.minio.ListObjectsArgs;
 import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
@@ -14,7 +13,6 @@ import io.minio.RemoveObjectsArgs;
 import io.minio.Result;
 import io.minio.StatObjectArgs;
 import io.minio.StatObjectResponse;
-import io.minio.http.Method;
 import io.minio.messages.Bucket;
 import io.minio.messages.DeleteError;
 import io.minio.messages.DeleteObject;
@@ -29,7 +27,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 
 @Component
@@ -190,11 +187,12 @@ public class MinioUtils {
 		boolean flag = bucketExists(bucketName);
 		String url = "";
 		if (flag) {
-			url = minioClient.getPresignedObjectUrl(
-					GetPresignedObjectUrlArgs.builder().method(Method.GET)
-							.bucket(bucketName).object(objectName)
-							.expiry(2, TimeUnit.MINUTES)
-							.build());
+			url = minioProperties.getEndpoint() + ":" + minioProperties.getPort() + "/" + bucketName + "/" + objectName;
+//			url = minioClient.getPresignedObjectUrl(
+//					GetPresignedObjectUrlArgs.builder().method(Method.GET)
+//							.bucket(bucketName).object(objectName)
+//							.expiry(2, TimeUnit.MINUTES)
+//							.build());
 		}
 		return url;
 	}
