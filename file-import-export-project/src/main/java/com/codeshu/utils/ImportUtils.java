@@ -7,10 +7,15 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -23,52 +28,79 @@ import java.util.List;
  */
 @Slf4j
 public class ImportUtils {
+	private static final String PATH = "E:\\java\\program\\java-private-project\\file-import-export-project";
+
+	public static void main(String[] args) throws IOException {
+		// 获取文件流
+		FileInputStream fis = new FileInputStream(PATH + "/user02.xlsx");
+		// 获取一个工作簿
+		Workbook workbook = new XSSFWorkbook(fis);
+
+		List<String[]> dataList = ImportUtils.readExcelData(workbook, 0, 1);
+
+		assert dataList != null;
+		for (String[] data : dataList) {
+			System.out.println(Arrays.toString(data));
+		}
+	}
+
 	/**
 	 * 将 Excel 表每条记录读取为一个 List 元素（可处理合并单元格）
 	 *
 	 * @param workbook      工作簿
 	 * @param sheetIndex    底部第几个工作表
-	 * @param startReadLine 开始读取的行数（如果第一列是列名，不想读取出来则写 2 表示从第二行开始读取）
+	 * @param startReadLine 开始读取的行数（如果第一行是列名，不想读取出来第一行则写 2 表示从第二行开始读取）
 	 * @return list[ [列值1,列值2,列值3] ,[列值1,列值2,列值3] ]
 	 */
 	public static List<String[]> readExcelData(Workbook workbook, int sheetIndex, int startReadLine) {
-		//构造返回的数据结构
+		// 构造返回的数据结构（一行就是 List 的一个 String[] 元素，此行的一个单元格值就是 String[] 的一个 String 元素）
 		List<String[]> result = new ArrayList<String[]>();
+		// 获取工作表
 		Sheet sheet = workbook.getSheetAt(sheetIndex);
+
 		Row row;
-		//总行数
+		// 总行数
 		int lastRowNum = sheet.getLastRowNum();
+		// 获取第一行，以及根据第一行获取每一行的单元格个数（列数）
+		Row firstRow = sheet.getRow(0);
+		int cellNumber = firstRow.getPhysicalNumberOfCells();
+		// 也可以使用以下方式获取单元格个数
+		// int cellNumber = sheet.getRow(0).getLastCellNum();
+
 		try {
 			// 读取指定要开始读取的行数 ~ 最后一行
 			for (int i = startReadLine - 1; i <= lastRowNum; i++) {
+				// 获取当前行
 				row = sheet.getRow(i);
-				//取第一行表头的列数
-				int columnNum = sheet.getRow(0).getLastCellNum();
-				//存放当前行的列值（单元格）
-				String[] values = new String[columnNum];
+				// 存放当前行的所有单元格值
+				String[] values = new String[cellNumber];
 				boolean isMerge;
-				//处理当前行的每一个列（单元格）
-				for (int j = 0; j < columnNum; j++) {
-					Cell c = row.getCell(j);
-					if (c != null) {
-						//根据列（单元格）的类型，都转为 String 类型，放入数组中
-						if (c.getCellType() == Cell.CELL_TYPE_NUMERIC && HSSFDateUtil.isCellDateFormatted(c)) {
+				// 处理当前行的每一个单元格值
+				for (int j = 0; j < cellNumber; j++) {
+					// 获取当前单元格
+					Cell cell = row.getCell(j);
+					if (cell != null) {
+						// 当前单元格的类型
+						int cellType = cell.getCellType();
+						// 将单元格的值，都转为 String 类型，放入数组中
+						if (cellType == Cell.CELL_TYPE_NUMERIC && HSSFDateUtil.isCellDateFormatted(cell)) {
 							DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-							values[j] = format.format(c.getDateCellValue());
+							values[j] = format.format(cell.getDateCellValue());
 						} else {
-							c.setCellType(Cell.CELL_TYPE_STRING);
+							cell.setCellType(Cell.CELL_TYPE_STRING);
 							// 判断是否具有合并单元格
-							isMerge = isMergedRegion(sheet, i, c.getColumnIndex());
+							isMerge = isMergedRegion(sheet, i, cell.getColumnIndex());
 							if (isMerge) {
 								// 获取合并单元格的值
-								String rs = getMergedRegionValue(sheet, row.getRowNum(), c.getColumnIndex());
+								String rs = getMergedRegionValue(sheet, row.getRowNum(), cell.getColumnIndex());
 								values[j] = rs;
 								log.debug("{}  ", values[j]);
 							} else {
-								values[j] = c.getRichStringCellValue().toString();
+								values[j] = cell.getRichStringCellValue().toString();
 							}
 						}
 					} else {
+						// 当前单元格为空
 						values[j] = null;
 					}
 				}
