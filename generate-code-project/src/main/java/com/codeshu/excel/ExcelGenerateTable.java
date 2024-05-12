@@ -31,7 +31,7 @@ public class ExcelGenerateTable {
 	 */
 	public static void generateCreateTable() throws IOException {
 		// 表字段名称和注释
-		Map<String, List<String>> resultMap = ExcelCommonUtils.getFieldCommendFromExcel(PATH);
+		Map<String, List<String>> resultMap = ExcelCommonUtils.getFieldCommendFromExcel(PATH,true);
 		List<String> fieldList = resultMap.get("fieldList");
 		List<String> commendList = resultMap.get("commendList");
 

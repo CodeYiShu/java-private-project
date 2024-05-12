@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 根据对象生成导出代码
+ * 根据对象生成导出代码（不涉及 Excel 文件）
  */
 public class ExcelGenerateExport {
 	public static void main(String[] args) {
