@@ -15,7 +15,10 @@ import java.util.stream.Collectors;
  */
 public class ExcelGenerateQianDuan {
 	// Excel 表路径
+	// 字段以列形式存放
 	private final static String PATH = "E:\\java\\program\\java-private-project\\generate-code-project\\src\\main\\resources\\excel\\字段.xlsx";
+	// 字段以行形式存放
+	private final static String SZ_PATH = "E:\\java\\program\\java-private-project\\generate-code-project\\src\\main\\resources\\excel\\实战导入模板.xlsx";
 
 	public static void main(String[] args) throws IOException {
 		generateQianDuan();
@@ -26,7 +29,8 @@ public class ExcelGenerateQianDuan {
 	 */
 	public static void generateQianDuan() throws IOException {
 		// 表字段名称和注释
-		Map<String, List<String>> resultMap = ExcelCommonUtils.getFieldCommendFromExcel(PATH,true);
+		// Map<String, List<String>> resultMap = ExcelCommonUtils.getFieldCommendFromExcel(PATH,true);
+		Map<String, List<String>> resultMap = ExcelCommonUtils.getFieldCommendFromExcel2(SZ_PATH,false);
 		List<String> fieldList = resultMap.get("fieldList");
 		List<String> commendList = resultMap.get("commendList");
 
@@ -38,7 +42,7 @@ public class ExcelGenerateQianDuan {
 		commendList = commendList.stream().filter(f -> !f.equals("id")).collect(Collectors.toList());
 
 		for (int i = 0; i < fieldList.size(); i = i + 2) {
-			String filed1 = fieldList.get(i).toLowerCase();
+			String filed1 = fieldList.get(i);
 			String commend1 = commendList.get(i);
 
 			stringBuilder.append("\t\t\t\t\t\t<tr>\n" +
@@ -47,7 +51,7 @@ public class ExcelGenerateQianDuan {
 					"\t\t\t\t\t\t\t\t<vm-ele-input name=\"" + filed1 + "\" v-model=\"data." + filed1 + "\" :can-edit=\"canEdit\"></vm-ele-input>\n" +
 					"\t\t\t\t\t\t\t</td>\n");
 			if (i != fieldList.size() - 1) {
-				String filed2 = fieldList.get(i + 1).toLowerCase();
+				String filed2 = fieldList.get(i + 1);
 				String commend2 = commendList.get(i + 1);
 				stringBuilder.append("\t\t\t\t\t\t\t<td style=\"width:15%;text-align:right;\"><label class=\"control-label\">" + commend2 + "</label></td>\n" +
 						"\t\t\t\t\t\t\t<td style=\"width:35%;\">\n" +

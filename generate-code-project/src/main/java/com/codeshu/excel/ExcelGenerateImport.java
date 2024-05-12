@@ -11,15 +11,14 @@ import java.util.Map;
  * @date 2024/5/12 14:04
  */
 public class ExcelGenerateImport {
-	// Excel 表路径
+	// 字段以列形式存放
 	private final static String PATH = "E:\\java\\program\\java-private-project\\generate-code-project\\src\\main\\resources\\excel\\字段.xlsx";
-
-	// Excel 表路径
-	private final static String PATH2 = "E:\\java\\program\\java-private-project\\generate-code-project\\src\\main\\resources\\excel\\实战导入模板.xlsx";
+	// 字段以行形式存放
+	private final static String SZ_PATH = "E:\\java\\program\\java-private-project\\generate-code-project\\src\\main\\resources\\excel\\实战导入模板.xlsx";
 
 	public static void main(String[] args) throws IOException {
 		// generateImport(PATH);
-		generateImport(PATH2);
+		generateImport(SZ_PATH);
 	}
 
 	/**

@@ -1,5 +1,6 @@
 package com.codeshu.excel.common;
 
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.pinyin.PinyinUtil;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -60,8 +61,14 @@ public class ExcelCommonUtils {
 
 			// 去掉特殊符号
 			cellValue = noNeedString(cellValue);
-			String py = PinyinUtil.getFirstLetter(cellValue, "");
-			String fieldName = upperCase ? py.toUpperCase() : py;
+			String fieldName;
+			if (StrUtil.isNotBlank(SpacialFieldEnum.getFieldNameByComment(cellValue))){
+				// 特殊字段
+				fieldName = upperCase ? SpacialFieldEnum.getTableNameByComment(cellValue) : SpacialFieldEnum.getFieldNameByComment(cellValue);
+			}else {
+				String py = PinyinUtil.getFirstLetter(cellValue, "");
+				fieldName = upperCase ? py.toUpperCase() : py;
+			}
 			// 将单元格的值转为拼音作为表字段名称
 			fieldList.add(fieldName);
 		}
@@ -80,8 +87,14 @@ public class ExcelCommonUtils {
 						commendList.add(cellValueStr);
 						// 去掉特殊符号
 						cellValueStr = noNeedString(cellValueStr);
-						String py = PinyinUtil.getFirstLetter(cellValueStr, "");
-						String fieldName = upperCase ? py.toUpperCase() : py;
+						String fieldName;
+						if (StrUtil.isNotBlank(SpacialFieldEnum.getFieldNameByComment(cellValueStr))){
+							// 特殊字段
+							fieldName = upperCase ? SpacialFieldEnum.getTableNameByComment(cellValueStr) : SpacialFieldEnum.getFieldNameByComment(cellValueStr);
+						}else {
+							String py = PinyinUtil.getFirstLetter(cellValueStr, "");
+							fieldName = upperCase ? py.toUpperCase() : py;
+						}
 						// 将单元格的值转为拼音作为表字段名称
 						fieldList.add(fieldName);
 					}
@@ -131,8 +144,14 @@ public class ExcelCommonUtils {
 
 			// 去掉特殊符号
 			cellValue = noNeedString(cellValue);
-			String py = PinyinUtil.getFirstLetter(cellValue, "");
-			String fieldName = upperCase ? py.toUpperCase() : py;
+			String fieldName;
+			if (StrUtil.isNotBlank(SpacialFieldEnum.getFieldNameByComment(cellValue))){
+				// 特殊字段
+				fieldName = upperCase ? SpacialFieldEnum.getTableNameByComment(cellValue) : SpacialFieldEnum.getFieldNameByComment(cellValue);
+			}else {
+				String py = PinyinUtil.getFirstLetter(cellValue, "");
+				fieldName = upperCase ? py.toUpperCase() : py;
+			}
 			// 将单元格的值转为拼音作为表字段名称
 			fieldList.add(fieldName);
 		}
